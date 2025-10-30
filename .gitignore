@@ -35,6 +35,7 @@ next-env.d.ts
 
 # Drizzle
 /drizzle
+drizzle.config.ts
 
 # Development files
 *.sh
@@ -45,3 +46,5 @@ SETUP_INSTRUCTIONS.md
 QUICK_START.md
 PROJECT_SUMMARY.md
 prisma/
+
+.vercel
