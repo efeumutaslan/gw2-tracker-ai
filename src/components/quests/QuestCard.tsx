@@ -136,7 +136,6 @@ export function QuestCard({ quest, onToggleComplete, onEdit, onDelete, onToggleF
 
   const handleFavoriteToggle = () => {
     if (onToggleFavorite) {
-      console.log('Toggling favorite:', quest.id, 'Current:', quest.isFavorite, 'New:', !quest.isFavorite);
       onToggleFavorite(quest.id, !quest.isFavorite);
     }
   };

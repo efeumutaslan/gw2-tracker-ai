@@ -189,6 +189,15 @@ export function QuestList({ quests, filters, isLoading, onRefresh }: QuestListPr
   };
 
   const handleToggleFavorite = async (questId: string, isFavorite: boolean) => {
+    // Optimistic update - update UI immediately
+    setQuests(prevQuests =>
+      prevQuests.map(quest =>
+        quest.id === questId
+          ? { ...quest, isFavorite }
+          : quest
+      )
+    );
+
     try {
       const response = await fetch('/api/quests/favorite', {
         method: 'POST',
@@ -199,6 +208,14 @@ export function QuestList({ quests, filters, isLoading, onRefresh }: QuestListPr
       const data = await response.json();
 
       if (!response.ok) {
+        // Revert on error
+        setQuests(prevQuests =>
+          prevQuests.map(quest =>
+            quest.id === questId
+              ? { ...quest, isFavorite: !isFavorite }
+              : quest
+          )
+        );
         throw new Error(data.error || 'Failed to update favorite status');
       }
 
@@ -210,6 +227,19 @@ export function QuestList({ quests, filters, isLoading, onRefresh }: QuestListPr
   };
 
   const handlePriorityChange = async (questId: string, priority: 'low' | 'medium' | 'high') => {
+    // Store old priority for rollback
+    const oldQuest = quests.find(q => q.id === questId);
+    const oldPriority = oldQuest?.priority;
+
+    // Optimistic update - update UI immediately
+    setQuests(prevQuests =>
+      prevQuests.map(quest =>
+        quest.id === questId
+          ? { ...quest, priority }
+          : quest
+      )
+    );
+
     try {
       const response = await fetch('/api/quests/priority', {
         method: 'POST',
@@ -220,6 +250,14 @@ export function QuestList({ quests, filters, isLoading, onRefresh }: QuestListPr
       const data = await response.json();
 
       if (!response.ok) {
+        // Revert on error
+        setQuests(prevQuests =>
+          prevQuests.map(quest =>
+            quest.id === questId
+              ? { ...quest, priority: oldPriority }
+              : quest
+          )
+        );
         throw new Error(data.error || 'Failed to update priority');
       }
 
