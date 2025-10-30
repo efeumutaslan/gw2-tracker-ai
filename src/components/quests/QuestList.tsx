@@ -20,6 +20,8 @@ interface Quest {
   estimatedDurationMinutes?: number;
   waypointCode?: string;
   nextResetAt: Date;
+  isFavorite?: boolean;
+  priority?: 'low' | 'medium' | 'high';
 }
 
 interface QuestListProps {
