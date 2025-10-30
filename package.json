@@ -35,6 +35,8 @@
     "autoprefixer": "^10.0.1",
     "postcss": "^8",
     "typescript": "^5",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.0",
     "zod": "^3.23.0"
   },
   "devDependencies": {
@@ -43,8 +45,6 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "drizzle-kit": "^0.21.0",
-    "eslint": "^8",
-    "eslint-config-next": "14.2.0"
+    "drizzle-kit": "^0.21.0"
   }
 }
