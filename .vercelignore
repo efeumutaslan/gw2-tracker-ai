@@ -1,0 +1,9 @@
+drizzle.config.ts
+*.sql
+*.sh
+SESSION_COMPLETION.md
+MANUAL_FILE_GUIDE.md
+SETUP_INSTRUCTIONS.md
+QUICK_START.md
+PROJECT_SUMMARY.md
+prisma/
