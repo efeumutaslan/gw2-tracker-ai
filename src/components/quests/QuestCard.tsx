@@ -375,7 +375,7 @@ export function QuestCard({ quest, onToggleComplete, onEdit, onDelete, onToggleF
                           initial={{ opacity: 0, scale: 0.95, y: 10 }}
                           animate={{ opacity: 1, scale: 1, y: 0 }}
                           exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                          className="absolute right-0 bottom-full mb-2 w-44 bg-dark-700/95 backdrop-blur-sm rounded-lg shadow-2xl border border-gray-600/30 z-50 overflow-hidden"
+                          className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-44 bg-dark-700/95 backdrop-blur-sm rounded-lg shadow-2xl border border-gray-600/30 z-50 overflow-hidden"
                         >
                           <button
                             onClick={() => handlePriorityChange('high')}
