@@ -2,8 +2,23 @@ import Link from 'next/link';
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-600 to-primary-800 flex items-center justify-center p-4">
-      <div className="max-w-4xl mx-auto text-center text-white">
+    <div className="relative min-h-screen flex items-center justify-center p-4 overflow-hidden">
+      {/* Video Background */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover"
+      >
+        <source src="/intro.mp4" type="video/mp4" />
+      </video>
+
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-black/60 via-primary-900/50 to-black/70" />
+
+      {/* Content */}
+      <div className="relative z-10 max-w-4xl mx-auto text-center text-white">
         <h1 className="text-5xl md:text-6xl font-bold mb-6">
           GW2 Quest Tracker
           <span className="ml-3 text-sm font-normal text-primary-200 opacity-70">
