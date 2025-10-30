@@ -136,6 +136,7 @@ export function QuestCard({ quest, onToggleComplete, onEdit, onDelete, onToggleF
 
   const handleFavoriteToggle = () => {
     if (onToggleFavorite) {
+      console.log('Toggling favorite:', quest.id, 'Current:', quest.isFavorite, 'New:', !quest.isFavorite);
       onToggleFavorite(quest.id, !quest.isFavorite);
     }
   };
@@ -180,13 +181,16 @@ export function QuestCard({ quest, onToggleComplete, onEdit, onDelete, onToggleF
       animate={isInView ? (isUrgent ? 'urgent' : 'visible') : 'hidden'}
       whileHover="hover"
       whileTap={{ scale: 0.98 }}
-      style={{ minHeight: '150px' }} // Prevent layout shift
+      style={{ minHeight: '150px', overflow: 'visible' }}
+      className="overflow-visible"
     >
       <motion.div
         variants={flameVariants}
         animate={isUrgent ? 'urgent' : 'normal'}
+        className="overflow-visible"
+        style={{ overflow: 'visible' }}
       >
-        <Card className={`${cardClasses} overflow-visible`}>
+        <Card className={`${cardClasses} !overflow-visible`}>
       <CardBody className="relative overflow-visible">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 space-y-3">
@@ -334,18 +338,18 @@ export function QuestCard({ quest, onToggleComplete, onEdit, onDelete, onToggleF
                   onClick={handleFavoriteToggle}
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
-                  className={`p-2 rounded-md transition-colors ${
+                  className={`p-2 rounded-md transition-all duration-200 ${
                     quest.isFavorite
-                      ? 'text-primary-400 hover:text-primary-300 bg-primary-500/10'
+                      ? 'text-primary-400 hover:text-primary-300 bg-primary-500/20'
                       : 'text-gray-500 hover:text-gray-300 hover:bg-gray-700/50'
                   }`}
                   title={quest.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
                 >
-                  <Star
-                    className="w-4 h-4"
-                    fill={quest.isFavorite ? 'currentColor' : 'none'}
-                    strokeWidth={2}
-                  />
+                  {quest.isFavorite ? (
+                    <Star className="w-4 h-4 fill-current" />
+                  ) : (
+                    <Star className="w-4 h-4" strokeWidth={2} />
+                  )}
                 </motion.button>
               )}
 
