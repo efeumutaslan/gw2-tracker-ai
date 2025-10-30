@@ -1,0 +1,20 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="512" height="512" fill="#0a0e14" rx="64"/>
+
+  <!-- Orange accent circle -->
+  <circle cx="256" cy="200" r="80" fill="#f29a37" opacity="0.2"/>
+
+  <!-- GW2 text -->
+  <text x="256" y="220" font-family="Arial, sans-serif" font-size="120" font-weight="bold" fill="#f29a37" text-anchor="middle">
+    GW2
+  </text>
+
+  <!-- Subtitle -->
+  <text x="256" y="320" font-family="Arial, sans-serif" font-size="40" font-weight="normal" fill="#ffffff" text-anchor="middle" opacity="0.9">
+    Quest Tracker
+  </text>
+
+  <!-- Bottom accent -->
+  <rect x="156" y="360" width="200" height="4" fill="#f29a37" rx="2"/>
+</svg>

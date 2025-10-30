@@ -6,6 +6,9 @@ export default function HomePage() {
       <div className="max-w-4xl mx-auto text-center text-white">
         <h1 className="text-5xl md:text-6xl font-bold mb-6">
           GW2 Quest Tracker
+          <span className="ml-3 text-sm font-normal text-primary-200 opacity-70">
+            (lecker lecker version)
+          </span>
         </h1>
         <p className="text-xl md:text-2xl mb-8 text-primary-100">
           Track your daily and weekly Guild Wars 2 quests with ease
