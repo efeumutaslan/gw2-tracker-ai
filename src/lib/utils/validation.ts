@@ -42,8 +42,9 @@ export const loginSchema = z.object({
 
 export const apiKeySchema = z.object({
   apiKey: z.string()
-    .length(72, 'GW2 API key must be 72 characters')
-    .regex(/^[A-F0-9\-]+$/i, 'Invalid API key format'),
+    .min(60, 'GW2 API key is too short')
+    .max(80, 'GW2 API key is too long')
+    .regex(/^[A-F0-9\-]+$/i, 'Invalid API key format (must contain only A-F, 0-9, and hyphens)'),
 });
 
 export const questTemplateSchema = z.object({
