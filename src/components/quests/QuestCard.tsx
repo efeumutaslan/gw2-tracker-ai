@@ -186,8 +186,8 @@ export function QuestCard({ quest, onToggleComplete, onEdit, onDelete, onToggleF
         variants={flameVariants}
         animate={isUrgent ? 'urgent' : 'normal'}
       >
-        <Card className={cardClasses}>
-      <CardBody>
+        <Card className={`${cardClasses} overflow-visible`}>
+      <CardBody className="relative overflow-visible">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 space-y-3">
             {/* Header */}
@@ -222,7 +222,7 @@ export function QuestCard({ quest, onToggleComplete, onEdit, onDelete, onToggleF
                       animate={{ opacity: 1, scale: 1 }}
                       className="px-2 py-1 rounded text-xs font-medium bg-primary-500/20 text-primary-300 border border-primary-500/30 flex items-center gap-1"
                     >
-                      <Star className="w-3 h-3 fill-current" />
+                      <Star className="w-3 h-3" fill="currentColor" />
                       Favorite
                     </motion.span>
                   )}
@@ -341,7 +341,11 @@ export function QuestCard({ quest, onToggleComplete, onEdit, onDelete, onToggleF
                   }`}
                   title={quest.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
                 >
-                  <Star className={`w-4 h-4 ${quest.isFavorite ? 'fill-current' : ''}`} />
+                  <Star
+                    className="w-4 h-4"
+                    fill={quest.isFavorite ? 'currentColor' : 'none'}
+                    strokeWidth={2}
+                  />
                 </motion.button>
               )}
 
@@ -375,7 +379,8 @@ export function QuestCard({ quest, onToggleComplete, onEdit, onDelete, onToggleF
                           initial={{ opacity: 0, scale: 0.95, y: 10 }}
                           animate={{ opacity: 1, scale: 1, y: 0 }}
                           exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                          className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-44 bg-dark-700/95 backdrop-blur-sm rounded-lg shadow-2xl border border-gray-600/30 z-50 overflow-hidden"
+                          className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-44 bg-dark-700 backdrop-blur-sm rounded-lg shadow-2xl border border-gray-600/50 overflow-hidden"
+                          style={{ zIndex: 9999 }}
                         >
                           <button
                             onClick={() => handlePriorityChange('high')}
