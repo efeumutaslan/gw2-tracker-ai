@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, useEffect } from 'react';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { useToast } from '@/components/ui/Toast';
 import { Card } from '@/components/ui/Card';
-import { Key, CheckCircle, Shield } from 'lucide-react';
+import { Key, CheckCircle, Shield, Loader2 } from 'lucide-react';
 
 interface ApiKeyFormProps {
   onSuccess?: () => void;
@@ -14,11 +14,38 @@ interface ApiKeyFormProps {
 export function ApiKeyForm({ onSuccess }: ApiKeyFormProps) {
   const { showToast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [isFetching, setIsFetching] = useState(true);
   const [apiKey, setApiKey] = useState('');
   const [accountInfo, setAccountInfo] = useState<{
     accountName: string;
     permissions: string[];
   } | null>(null);
+
+  // Fetch existing API key info on mount
+  useEffect(() => {
+    fetchApiKeyInfo();
+  }, []);
+
+  const fetchApiKeyInfo = async () => {
+    try {
+      setIsFetching(true);
+      const response = await fetch('/api/gw2/account');
+
+      if (response.ok) {
+        const data = await response.json();
+        // API key exists and is valid
+        setAccountInfo({
+          accountName: data.account.name,
+          permissions: [],
+        });
+      }
+    } catch (error) {
+      // No API key or error - this is fine
+      console.log('No existing API key found');
+    } finally {
+      setIsFetching(false);
+    }
+  };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -44,6 +71,10 @@ export function ApiKeyForm({ onSuccess }: ApiKeyFormProps) {
 
       showToast('success', 'API key validated and saved successfully!');
       setApiKey('');
+
+      // Refresh to fetch full account info
+      await fetchApiKeyInfo();
+
       if (onSuccess) onSuccess();
     } catch (error) {
       showToast('error', error instanceof Error ? error.message : 'Failed to validate API key');
@@ -66,21 +97,30 @@ export function ApiKeyForm({ onSuccess }: ApiKeyFormProps) {
           </div>
         </div>
 
+        {/* Loading State */}
+        {isFetching && (
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="w-6 h-6 text-primary-400 animate-spin" />
+          </div>
+        )}
+
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <Input
-            label="API Key"
-            value={apiKey}
-            onChange={(e) => setApiKey(e.target.value)}
-            placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXXXXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
-            required
-            disabled={isLoading}
-            helperText="Get your API key from account.arena.net/applications"
-          />
-          <Button type="submit" isLoading={isLoading} className="w-full">
-            Validate & Save API Key
-          </Button>
-        </form>
+        {!isFetching && (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <Input
+              label="API Key"
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+              placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXXXXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+              required
+              disabled={isLoading}
+              helperText="Get your API key from account.arena.net/applications"
+            />
+            <Button type="submit" isLoading={isLoading} className="w-full">
+              {accountInfo ? 'Update API Key' : 'Validate & Save API Key'}
+            </Button>
+          </form>
+        )}
 
         {/* Connected Account Info */}
         {accountInfo && (

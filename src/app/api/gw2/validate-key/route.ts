@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { validateApiKey } from '@/lib/gw2/api';
 import { encrypt } from '@/lib/crypto/encryption';
-import { saveUserApiKey } from '@/lib/db/queries';
+import { saveUserApiKey, getUserById, createUser } from '@/lib/db/queries';
 import { apiKeySchema } from '@/lib/utils/validation';
 
 export async function POST(req: NextRequest) {
@@ -15,6 +15,22 @@ export async function POST(req: NextRequest) {
         { error: 'Not authenticated' },
         { status: 401 }
       );
+    }
+
+    // Ensure user exists in database
+    try {
+      const existingUser = await getUserById(user.id);
+      if (!existingUser) {
+        console.log('Creating user record for:', user.id);
+        await createUser({
+          id: user.id,
+          email: user.email!,
+          timezone: 'UTC',
+        });
+      }
+    } catch (err) {
+      console.error('Error ensuring user exists:', err);
+      // Continue anyway - saveUserApiKey will fail if user doesn't exist
     }
 
     const body = await req.json();
@@ -58,7 +74,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error('API key validation error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }
