@@ -206,9 +206,9 @@ export function QuestCard({ quest, onToggleComplete, onEdit, onDelete, onToggleF
                 )}
               </motion.button>
 
-              <div className="flex-1">
-                <h3 className={`text-lg font-bold mb-2 ${quest.isCompleted ? 'line-through text-gray-500' : 'text-gray-100'}`}>
-                  {quest.name}
+              <div className="flex-1 min-w-0">
+                <h3 className={`text-lg font-semibold mb-2 leading-tight ${quest.isCompleted ? 'line-through text-gray-400' : 'text-white'}`}>
+                  {quest.name || 'Untitled Quest'}
                 </h3>
 
                 <div className="flex items-center gap-2 flex-wrap">
@@ -311,12 +311,13 @@ export function QuestCard({ quest, onToggleComplete, onEdit, onDelete, onToggleF
           </div>
 
           {/* Actions */}
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 shrink-0">
+            {/* Main Action Button */}
             <Button
               size="sm"
               variant={quest.isCompleted ? 'secondary' : 'primary'}
               onClick={handleToggle}
-              className="btn-glow min-w-[100px]"
+              className="btn-glow w-full min-w-[100px]"
             >
               {quest.isCompleted ? 'Undo' : 'Complete'}
             </Button>
@@ -325,96 +326,109 @@ export function QuestCard({ quest, onToggleComplete, onEdit, onDelete, onToggleF
               <WaypointButton waypointCode={quest.waypointCode} />
             )}
 
-            {/* Favorite Button */}
-            {onToggleFavorite && (
-              <motion.button
-                onClick={handleFavoriteToggle}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                className={`p-2 rounded transition-colors ${
-                  quest.isFavorite
-                    ? 'text-primary-400 hover:text-primary-300'
-                    : 'text-gray-500 hover:text-gray-300'
-                }`}
-              >
-                <Star className={`w-5 h-5 ${quest.isFavorite ? 'fill-current' : ''}`} />
-              </motion.button>
-            )}
-
-            {/* Priority Button with Dropdown */}
-            {onPriorityChange && (
-              <div className="relative">
+            {/* Icon Actions Row */}
+            <div className="flex items-center justify-center gap-1 pt-1">
+              {/* Favorite Button */}
+              {onToggleFavorite && (
                 <motion.button
-                  onClick={() => setShowPriorityMenu(!showPriorityMenu)}
+                  onClick={handleFavoriteToggle}
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
-                  className={`p-2 rounded transition-colors ${
-                    quest.priority === 'high'
-                      ? 'text-red-400 hover:text-red-300'
-                      : quest.priority === 'low'
-                      ? 'text-gray-500 hover:text-gray-300'
-                      : 'text-yellow-400 hover:text-yellow-300'
+                  className={`p-2 rounded-md transition-colors ${
+                    quest.isFavorite
+                      ? 'text-primary-400 hover:text-primary-300 bg-primary-500/10'
+                      : 'text-gray-500 hover:text-gray-300 hover:bg-gray-700/50'
                   }`}
+                  title={quest.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
                 >
-                  <Flag className="w-5 h-5" />
+                  <Star className={`w-4 h-4 ${quest.isFavorite ? 'fill-current' : ''}`} />
                 </motion.button>
+              )}
 
-                <AnimatePresence>
-                  {showPriorityMenu && (
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.95, y: -10 }}
-                      animate={{ opacity: 1, scale: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                      className="absolute right-0 mt-1 w-40 glass rounded-lg shadow-xl z-50 overflow-hidden"
-                    >
-                      <button
-                        onClick={() => handlePriorityChange('high')}
-                        className="w-full px-3 py-2 text-left text-sm hover:bg-dark-600/50 transition-colors flex items-center gap-2 text-red-400"
-                      >
-                        <Flag className="w-4 h-4" />
-                        High Priority
-                      </button>
-                      <button
-                        onClick={() => handlePriorityChange('medium')}
-                        className="w-full px-3 py-2 text-left text-sm hover:bg-dark-600/50 transition-colors flex items-center gap-2 text-yellow-400"
-                      >
-                        <Flag className="w-4 h-4" />
-                        Medium
-                      </button>
-                      <button
-                        onClick={() => handlePriorityChange('low')}
-                        className="w-full px-3 py-2 text-left text-sm hover:bg-dark-600/50 transition-colors flex items-center gap-2 text-gray-400"
-                      >
-                        <Flag className="w-4 h-4" />
-                        Low Priority
-                      </button>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            )}
+              {/* Priority Button with Dropdown */}
+              {onPriorityChange && (
+                <div className="relative">
+                  <motion.button
+                    onClick={() => setShowPriorityMenu(!showPriorityMenu)}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    className={`p-2 rounded-md transition-colors ${
+                      quest.priority === 'high'
+                        ? 'text-red-400 hover:text-red-300 bg-red-500/10'
+                        : quest.priority === 'low'
+                        ? 'text-gray-500 hover:text-gray-300 hover:bg-gray-700/50'
+                        : 'text-yellow-400 hover:text-yellow-300 bg-yellow-500/10'
+                    }`}
+                    title="Set priority"
+                  >
+                    <Flag className="w-4 h-4" />
+                  </motion.button>
 
-            {onEdit && (
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => onEdit(quest.id)}
-                className="text-gray-400 hover:text-gray-200"
-              >
-                <Edit3 className="w-4 h-4" />
-              </Button>
-            )}
+                  <AnimatePresence>
+                    {showPriorityMenu && (
+                      <>
+                        <div
+                          className="fixed inset-0 z-40"
+                          onClick={() => setShowPriorityMenu(false)}
+                        />
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                          animate={{ opacity: 1, scale: 1, y: 0 }}
+                          exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                          className="absolute right-0 bottom-full mb-2 w-44 bg-dark-700/95 backdrop-blur-sm rounded-lg shadow-2xl border border-gray-600/30 z-50 overflow-hidden"
+                        >
+                          <button
+                            onClick={() => handlePriorityChange('high')}
+                            className="w-full px-4 py-2.5 text-left text-sm hover:bg-red-500/20 transition-colors flex items-center gap-2 text-red-400 border-b border-gray-700/50"
+                          >
+                            <Flag className="w-4 h-4" />
+                            High Priority
+                          </button>
+                          <button
+                            onClick={() => handlePriorityChange('medium')}
+                            className="w-full px-4 py-2.5 text-left text-sm hover:bg-yellow-500/20 transition-colors flex items-center gap-2 text-yellow-400 border-b border-gray-700/50"
+                          >
+                            <Flag className="w-4 h-4" />
+                            Medium
+                          </button>
+                          <button
+                            onClick={() => handlePriorityChange('low')}
+                            className="w-full px-4 py-2.5 text-left text-sm hover:bg-gray-500/20 transition-colors flex items-center gap-2 text-gray-400"
+                          >
+                            <Flag className="w-4 h-4" />
+                            Low Priority
+                          </button>
+                        </motion.div>
+                      </>
+                    )}
+                  </AnimatePresence>
+                </div>
+              )}
 
-            {onDelete && (
-              <Button
-                size="sm"
-                variant="danger"
-                onClick={() => onDelete(quest.id)}
-                className="text-red-400 hover:text-red-300"
-              >
-                <Trash2 className="w-4 h-4" />
-              </Button>
-            )}
+              {onEdit && (
+                <motion.button
+                  onClick={() => onEdit(quest.id)}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  className="p-2 rounded-md text-gray-400 hover:text-gray-200 hover:bg-gray-700/50 transition-colors"
+                  title="Edit quest"
+                >
+                  <Edit3 className="w-4 h-4" />
+                </motion.button>
+              )}
+
+              {onDelete && (
+                <motion.button
+                  onClick={() => onDelete(quest.id)}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  className="p-2 rounded-md text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors"
+                  title="Delete quest"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </motion.button>
+              )}
+            </div>
           </div>
         </div>
       </CardBody>
