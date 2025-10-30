@@ -1,5 +1,23 @@
 import { z } from 'zod';
-import DOMPurify from 'isomorphic-dompurify';
+
+// Simple HTML sanitization function (server-side safe, no JSDOM dependency)
+function sanitizeString(str: string): string {
+  if (!str) return str;
+  // Remove HTML tags and potentially dangerous characters
+  return str
+    .replace(/<[^>]*>/g, '') // Remove HTML tags
+    .replace(/[<>'"&]/g, (char) => { // Escape dangerous characters
+      const escapeMap: Record<string, string> = {
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#x27;',
+        '&': '&amp;',
+      };
+      return escapeMap[char] || char;
+    })
+    .trim();
+}
 
 // Frontend validation schema (with confirmPassword)
 export const registerFormSchema = z.object({
@@ -32,11 +50,11 @@ export const questTemplateSchema = z.object({
   name: z.string()
     .min(1, 'Quest name is required')
     .max(200, 'Quest name too long')
-    .transform(val => DOMPurify.sanitize(val.trim())),
+    .transform(val => sanitizeString(val)),
   description: z.string()
     .max(1000, 'Description too long')
     .optional()
-    .transform(val => val ? DOMPurify.sanitize(val) : undefined),
+    .transform(val => val ? sanitizeString(val) : undefined),
   category: z.string()
     .max(100, 'Category too long')
     .optional(),
@@ -59,7 +77,7 @@ export const questTemplateSchema = z.object({
   notes: z.string()
     .max(500, 'Notes too long')
     .optional()
-    .transform(val => val ? DOMPurify.sanitize(val) : undefined),
+    .transform(val => val ? sanitizeString(val) : undefined),
 }).refine((data) => {
   return data.isAccountBound || data.isCharacterBound;
 }, {
@@ -78,10 +96,7 @@ export const userSettingsSchema = z.object({
 });
 
 export function sanitizeHtml(html: string): string {
-  return DOMPurify.sanitize(html, {
-    ALLOWED_TAGS: [],
-    ALLOWED_ATTR: [],
-  });
+  return sanitizeString(html);
 }
 
 export function isValidUuid(uuid: string): boolean {
