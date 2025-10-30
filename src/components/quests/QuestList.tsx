@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import { QuestCard } from './QuestCard';
 import { Spinner } from '@/components/ui/Spinner';
@@ -29,10 +29,16 @@ interface QuestListProps {
   onRefresh?: () => void;
 }
 
-export function QuestList({ quests, filters, isLoading, onRefresh }: QuestListProps) {
+export function QuestList({ quests: initialQuests, filters, isLoading, onRefresh }: QuestListProps) {
   const { showToast } = useToast();
+  const [quests, setQuests] = useState(initialQuests);
   const [processingIds, setProcessingIds] = useState<Set<string>>(new Set());
   const [currentAchievement, setCurrentAchievement] = useState<Achievement | null>(null);
+
+  // Sync local state with prop changes
+  useEffect(() => {
+    setQuests(initialQuests);
+  }, [initialQuests]);
 
   // Apply filters and sorting
   const filteredQuests = useMemo(() => {
