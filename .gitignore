@@ -1,0 +1,47 @@
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# Testing
+/coverage
+
+# Next.js
+/.next/
+/out/
+
+# Production
+/build
+
+# Misc
+.DS_Store
+*.pem
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local env files
+.env*.local
+.env
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Drizzle
+/drizzle
+
+# Development files
+*.sh
+*.sql
+SESSION_COMPLETION.md
+MANUAL_FILE_GUIDE.md
+SETUP_INSTRUCTIONS.md
+QUICK_START.md
+PROJECT_SUMMARY.md
+prisma/
