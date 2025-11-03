@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { getCharactersByUserId, deleteCharacter, ensureUserExists } from '@/lib/db/queries';
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -13,40 +14,32 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const { data: characters, error } = await supabase
-      .from('user_characters')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('level', { ascending: false });
+    // Ensure user exists in database
+    await ensureUserExists(user.id, user.email!);
 
-    if (error) {
-      console.error('Get characters error:', error);
-      return NextResponse.json(
-        { error: 'Failed to fetch characters' },
-        { status: 500 }
-      );
-    }
+    // Fetch characters from database using Drizzle
+    const characters = await getCharactersByUserId(user.id);
 
     // Transform to camelCase for frontend
-    const transformedCharacters = (characters || []).map((char) => ({
+    const transformedCharacters = (characters || []).map((char: any) => ({
       id: char.id,
-      characterName: char.character_name,
-      race: char.race,
-      profession: char.profession,
-      level: char.level,
-      guild: char.guild,
-      age: char.age,
-      deaths: char.deaths,
-      crafting: char.crafting,
-      lastSynced: char.last_synced,
-      createdAt: char.created_at,
+      characterName: char.gw2CharacterName,
+      race: 'Unknown', // We don't store race in new schema
+      profession: char.profession || 'Unknown',
+      level: char.level || 0,
+      guild: null,
+      age: 0,
+      deaths: 0,
+      crafting: [],
+      lastSynced: char.lastSyncedAt,
+      createdAt: char.createdAt,
     }));
 
     return NextResponse.json({ characters: transformedCharacters });
   } catch (error) {
     console.error('Get characters error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }
@@ -74,19 +67,8 @@ export async function DELETE(req: NextRequest) {
       );
     }
 
-    const { error } = await supabase
-      .from('user_characters')
-      .delete()
-      .eq('id', characterId)
-      .eq('user_id', user.id);
-
-    if (error) {
-      console.error('Delete character error:', error);
-      return NextResponse.json(
-        { error: 'Failed to delete character' },
-        { status: 500 }
-      );
-    }
+    // Delete character using Drizzle
+    await deleteCharacter(characterId);
 
     return NextResponse.json({ success: true });
   } catch (error) {
