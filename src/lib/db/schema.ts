@@ -154,6 +154,56 @@ export const questCompletionsRelations = relations(questCompletions, ({ one }) =
   }),
 }));
 
+// Legendary Tracking Tables
+export const userLegendaries = pgTable('user_legendaries', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  legendaryId: varchar('legendary_id', { length: 100 }).notNull(), // e.g., 'eternity', 'sunrise'
+  isTracking: boolean('is_tracking').default(true),
+  progress: integer('progress').default(0), // 0-100
+  notes: text('notes'),
+  startedAt: timestamp('started_at', { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+  completedAt: timestamp('completed_at', { withTimezone: true }),
+}, (table) => ({
+  userLegendaryIdx: uniqueIndex('user_legendaries_user_legendary_idx').on(table.userId, table.legendaryId),
+  userIdIdx: index('user_legendaries_user_id_idx').on(table.userId),
+}));
+
+// Material Reserves - tracks which materials are reserved for which legendary
+export const materialReserves = pgTable('material_reserves', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  userLegendaryId: uuid('user_legendary_id').notNull().references(() => userLegendaries.id, { onDelete: 'cascade' }),
+  itemId: integer('item_id'), // GW2 API item ID
+  itemName: varchar('item_name', { length: 200 }).notNull(),
+  quantityReserved: integer('quantity_reserved').notNull().default(0),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+}, (table) => ({
+  userLegendaryItemIdx: uniqueIndex('material_reserves_legendary_item_idx').on(table.userLegendaryId, table.itemName),
+  userIdIdx: index('material_reserves_user_id_idx').on(table.userId),
+}));
+
+// Material Progress - tracks user's progress on individual materials
+export const materialProgress = pgTable('material_progress', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  userLegendaryId: uuid('user_legendary_id').notNull().references(() => userLegendaries.id, { onDelete: 'cascade' }),
+  componentId: varchar('component_id', { length: 100 }).notNull(), // e.g., 'gifts_of_mastery'
+  itemName: varchar('item_name', { length: 200 }).notNull(),
+  completed: boolean('completed').default(false),
+  completedAt: timestamp('completed_at', { withTimezone: true }),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+}, (table) => ({
+  userLegendaryComponentItemIdx: uniqueIndex('material_progress_legendary_component_item_idx').on(
+    table.userLegendaryId,
+    table.componentId,
+    table.itemName
+  ),
+  userIdIdx: index('material_progress_user_id_idx').on(table.userId),
+}));
+
 // Types
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
@@ -167,3 +217,9 @@ export type UserQuest = typeof userQuests.$inferSelect;
 export type NewUserQuest = typeof userQuests.$inferInsert;
 export type QuestCompletion = typeof questCompletions.$inferSelect;
 export type NewQuestCompletion = typeof questCompletions.$inferInsert;
+export type UserLegendary = typeof userLegendaries.$inferSelect;
+export type NewUserLegendary = typeof userLegendaries.$inferInsert;
+export type MaterialReserve = typeof materialReserves.$inferSelect;
+export type NewMaterialReserve = typeof materialReserves.$inferInsert;
+export type MaterialProgress = typeof materialProgress.$inferSelect;
+export type NewMaterialProgress = typeof materialProgress.$inferInsert;

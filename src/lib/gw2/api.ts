@@ -110,3 +110,127 @@ export async function getAllCharacterDetails(apiKey: string): Promise<{
 export function delay(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
+
+/**
+ * Get account materials (material storage)
+ */
+export async function getAccountMaterials(apiKey: string): Promise<{
+  data?: Array<{ id: number; category: number; count: number; binding?: string }>;
+  error?: string;
+}> {
+  return gw2ApiRequest('/account/materials', apiKey);
+}
+
+/**
+ * Get account bank contents
+ */
+export async function getAccountBank(apiKey: string): Promise<{
+  data?: Array<{ id: number; count: number; skin?: number; upgrades?: number[]; infusions?: number[]; binding?: string } | null>;
+  error?: string;
+}> {
+  return gw2ApiRequest('/account/bank', apiKey);
+}
+
+/**
+ * Get account inventory (shared inventory slots)
+ */
+export async function getAccountInventory(apiKey: string): Promise<{
+  data?: Array<{ id: number; count: number; binding?: string } | null>;
+  error?: string;
+}> {
+  return gw2ApiRequest('/account/inventory', apiKey);
+}
+
+/**
+ * Get all character inventories
+ */
+export async function getAllCharacterInventories(apiKey: string): Promise<{
+  data?: Record<string, any>;
+  error?: string;
+}> {
+  const { data: characterNames, error: listError } = await getCharacters(apiKey);
+
+  if (listError || !characterNames) {
+    return { error: listError || 'Failed to fetch character list' };
+  }
+
+  const inventoryPromises = characterNames.map(async (name) => {
+    const encodedName = encodeURIComponent(name);
+    const { data, error } = await gw2ApiRequest(`/characters/${encodedName}/inventory`, apiKey);
+    return { name, inventory: data, error };
+  });
+
+  const results = await Promise.all(inventoryPromises);
+  const inventories: Record<string, any> = {};
+
+  results.forEach((result) => {
+    if (result.inventory) {
+      inventories[result.name] = result.inventory;
+    }
+  });
+
+  return { data: inventories };
+}
+
+/**
+ * Aggregate all materials across account
+ * Returns a map of itemId -> total count
+ */
+export async function getAggregatedMaterials(apiKey: string): Promise<{
+  data?: Record<number, number>;
+  error?: string;
+}> {
+  const materialsMap: Record<number, number> = {};
+
+  // Get material storage
+  const { data: materials, error: materialsError } = await getAccountMaterials(apiKey);
+  if (materialsError) {
+    return { error: materialsError };
+  }
+
+  if (materials) {
+    materials.forEach((item) => {
+      materialsMap[item.id] = (materialsMap[item.id] || 0) + item.count;
+    });
+  }
+
+  // Get bank
+  const { data: bank, error: bankError } = await getAccountBank(apiKey);
+  if (!bankError && bank) {
+    bank.forEach((slot) => {
+      if (slot && slot.id) {
+        materialsMap[slot.id] = (materialsMap[slot.id] || 0) + slot.count;
+      }
+    });
+  }
+
+  // Get shared inventory
+  const { data: sharedInv, error: sharedError } = await getAccountInventory(apiKey);
+  if (!sharedError && sharedInv) {
+    sharedInv.forEach((slot) => {
+      if (slot && slot.id) {
+        materialsMap[slot.id] = (materialsMap[slot.id] || 0) + slot.count;
+      }
+    });
+  }
+
+  // Get character inventories
+  const { data: charInventories, error: charError } = await getAllCharacterInventories(apiKey);
+  if (!charError && charInventories) {
+    Object.values(charInventories).forEach((charInv: any) => {
+      if (charInv && charInv.bags) {
+        charInv.bags.forEach((bag: any) => {
+          if (bag && bag.inventory) {
+            bag.inventory.forEach((slot: any) => {
+              if (slot && slot.id) {
+                materialsMap[slot.id] = (materialsMap[slot.id] || 0) + slot.count;
+              }
+            });
+          }
+        });
+      }
+    });
+  }
+
+  return { data: materialsMap };
+}
