@@ -6,6 +6,7 @@ import { Select } from '@/components/ui/Select';
 import { Button } from '@/components/ui/Button';
 import { useToast } from '@/components/ui/Toast';
 import { QuestTemplateSelector } from './QuestTemplateSelector';
+import { ItemRewardInput, ItemReward } from './ItemRewardInput';
 import { QuestTemplate } from '@/lib/data/questTemplates';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
@@ -33,6 +34,8 @@ export function QuestForm({ onSuccess, onCancel }: QuestFormProps) {
   const { showToast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [showTemplates, setShowTemplates] = useState(true);
+  const [itemRewards, setItemRewards] = useState<ItemReward[]>([]);
+  const [goldReward, setGoldReward] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -41,7 +44,6 @@ export function QuestForm({ onSuccess, onCancel }: QuestFormProps) {
     resetTime: '00:00',
     questType: 'account', // 'account' or 'character'
     waypointCode: '',
-    reward: '',
     durationMinutes: '',
     durationSeconds: '',
     notes: '',
@@ -56,11 +58,15 @@ export function QuestForm({ onSuccess, onCancel }: QuestFormProps) {
       resetTime: template.frequency === 'daily' ? '00:00' : '07:30',
       questType: 'account',
       waypointCode: template.waypointCode || '',
-      reward: template.goldReward ? `${template.goldReward} gold` : '',
       durationMinutes: template.estimatedDurationMinutes?.toString() || '',
       durationSeconds: '',
       notes: template.tags.join(', '),
     });
+    // Set gold reward if template has one
+    if (template.goldReward) {
+      setGoldReward(template.goldReward.toString());
+    }
+    setItemRewards([]);
     setShowTemplates(false);
     showToast('success', `Template "${template.name}" loaded!`);
   };
@@ -91,6 +97,21 @@ export function QuestForm({ onSuccess, onCancel }: QuestFormProps) {
       const seconds = parseInt(formData.durationSeconds || '0');
       const totalMinutes = minutes + (seconds > 0 ? 1 : 0); // Round up if has seconds
 
+      // Build reward string
+      const rewardParts: string[] = [];
+
+      // Add gold reward
+      if (goldReward && parseFloat(goldReward) > 0) {
+        rewardParts.push(`${goldReward} gold`);
+      }
+
+      // Add item rewards
+      itemRewards.forEach(reward => {
+        rewardParts.push(`${reward.quantity}x ${reward.name}`);
+      });
+
+      const rewardString = rewardParts.length > 0 ? `Rewards: ${rewardParts.join(', ')}` : '';
+
       const requestData = {
         name: formData.name.trim(),
         description: formData.description.trim() || undefined,
@@ -100,9 +121,9 @@ export function QuestForm({ onSuccess, onCancel }: QuestFormProps) {
         isAccountBound: formData.questType === 'account',
         isCharacterBound: formData.questType === 'character',
         waypointCode: formData.waypointCode.trim() || undefined,
-        goldReward: 0, // Always 0, we use text reward now
+        goldReward: parseFloat(goldReward) || 0,
         estimatedDurationMinutes: totalMinutes || 0,
-        notes: formData.reward ? `Reward: ${formData.reward}${formData.notes ? '\n\n' + formData.notes : ''}` : formData.notes || undefined,
+        notes: rewardString ? `${rewardString}${formData.notes ? '\n\n' + formData.notes : ''}` : formData.notes || undefined,
       };
 
       console.log('Sending quest data:', requestData);
@@ -208,13 +229,12 @@ export function QuestForm({ onSuccess, onCancel }: QuestFormProps) {
         </div>
       )}
 
-      <Input
-        label="Reward"
-        value={formData.reward}
-        onChange={(e) => setFormData({ ...formData, reward: e.target.value })}
+      <ItemRewardInput
+        rewards={itemRewards}
+        goldReward={goldReward}
+        onRewardsChange={setItemRewards}
+        onGoldChange={setGoldReward}
         disabled={isLoading}
-        placeholder="e.g., 15 Kalkite Ore, 5 gold, Mystic Coin"
-        helperText="Enter the quest reward (items, gold, etc.)"
       />
 
       <div>

@@ -4,7 +4,8 @@ import { Select } from '@/components/ui/Select';
 
 interface Character {
   id: string;
-  gw2CharacterName: string;
+  characterName?: string;
+  gw2CharacterName?: string; // Fallback for compatibility
 }
 
 interface CharacterSelectorProps {
@@ -24,7 +25,7 @@ export function CharacterSelector({
     ...(includeAll ? [{ value: 'all', label: 'All Characters' }] : []),
     ...characters.map((char) => ({
       value: char.id,
-      label: char.gw2CharacterName,
+      label: char.characterName || char.gw2CharacterName || 'Unknown',
     })),
   ];
 
