@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { getUserApiKey } from '@/lib/db/queries';
+import { getUserApiKey, ensureUserExists } from '@/lib/db/queries';
 import { decrypt } from '@/lib/crypto/encryption';
 import { getAllCharacterDetails } from '@/lib/gw2/api';
 
@@ -16,11 +16,15 @@ export async function GET(req: NextRequest) {
       );
     }
 
+    // Ensure user exists in database
+    await ensureUserExists(user.id, user.email!);
+
     const apiKeyData = await getUserApiKey(user.id);
 
     if (!apiKeyData) {
+      console.log('No API key found for user:', user.id);
       return NextResponse.json(
-        { error: 'No API key found' },
+        { error: 'No API key found. Please add your GW2 API key in Settings first.' },
         { status: 404 }
       );
     }

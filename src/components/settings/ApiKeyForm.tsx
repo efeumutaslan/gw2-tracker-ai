@@ -36,7 +36,7 @@ export function ApiKeyForm({ onSuccess }: ApiKeyFormProps) {
         // API key exists and is valid
         setAccountInfo({
           accountName: data.account.name,
-          permissions: [],
+          permissions: data.permissions || [],
         });
       }
     } catch (error) {

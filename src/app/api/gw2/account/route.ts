@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { getUserApiKey } from '@/lib/db/queries';
+import { getUserApiKey, ensureUserExists } from '@/lib/db/queries';
 import { decrypt } from '@/lib/crypto/encryption';
 import { getAccount } from '@/lib/gw2/api';
 
@@ -15,6 +15,9 @@ export async function GET(req: NextRequest) {
         { status: 401 }
       );
     }
+
+    // Ensure user exists in database
+    await ensureUserExists(user.id, user.email!);
 
     const apiKeyData = await getUserApiKey(user.id);
 
@@ -43,6 +46,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       success: true,
       account: data,
+      permissions: apiKeyData.permissions || [],
     });
   } catch (error) {
     console.error('Get account info error:', error);

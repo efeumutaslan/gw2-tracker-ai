@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { validateApiKey } from '@/lib/gw2/api';
 import { encrypt } from '@/lib/crypto/encryption';
-import { saveUserApiKey, getUserById, createUser } from '@/lib/db/queries';
+import { saveUserApiKey, ensureUserExists } from '@/lib/db/queries';
 import { apiKeySchema } from '@/lib/utils/validation';
 
 export async function POST(req: NextRequest) {
@@ -18,20 +18,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Ensure user exists in database
-    try {
-      const existingUser = await getUserById(user.id);
-      if (!existingUser) {
-        console.log('Creating user record for:', user.id);
-        await createUser({
-          id: user.id,
-          email: user.email!,
-          timezone: 'UTC',
-        });
-      }
-    } catch (err) {
-      console.error('Error ensuring user exists:', err);
-      // Continue anyway - saveUserApiKey will fail if user doesn't exist
-    }
+    await ensureUserExists(user.id, user.email!);
 
     const body = await req.json();
 

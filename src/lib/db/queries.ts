@@ -15,6 +15,29 @@ export async function createUser(data: schema.NewUser) {
   return user;
 }
 
+/**
+ * Ensures user exists in database, creates if not found
+ * Call this in all endpoints that require user data
+ */
+export async function ensureUserExists(userId: string, email: string) {
+  try {
+    const existingUser = await getUserById(userId);
+    if (!existingUser) {
+      console.log('Creating user record for:', userId);
+      await createUser({
+        id: userId,
+        email,
+        timezone: 'UTC',
+      });
+      return true; // User was created
+    }
+    return false; // User already existed
+  } catch (err) {
+    console.error('Error in ensureUserExists:', err);
+    throw err;
+  }
+}
+
 export async function updateUser(userId: string, data: Partial<schema.NewUser>) {
   const [user] = await db.update(schema.users)
     .set({ ...data, updatedAt: new Date() })
