@@ -23,6 +23,7 @@ export default function QuestsPage() {
     status: 'all',
     priority: 'all',
     favorite: 'all',
+    rewardType: 'all',
     sortBy: 'dateAdded',
   });
 

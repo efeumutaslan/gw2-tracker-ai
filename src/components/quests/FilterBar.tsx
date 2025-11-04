@@ -1,8 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Search, Filter, SortAsc, X, Star, Flag } from 'lucide-react';
-import { QuestFilters, SortOption, FilterStatus, FilterPriority, FilterFavorite } from '@/lib/utils/questFilters';
+import { Search, Filter, SortAsc, X, Star, Flag, Gift } from 'lucide-react';
+import { QuestFilters, SortOption, FilterStatus, FilterPriority, FilterFavorite, FilterReward } from '@/lib/utils/questFilters';
 
 interface FilterBarProps {
   filters: QuestFilters;
@@ -36,6 +36,10 @@ export function FilterBar({ filters, categories, questCounts, onFiltersChange }:
     onFiltersChange({ ...filters, favorite });
   };
 
+  const handleRewardChange = (rewardType: FilterReward) => {
+    onFiltersChange({ ...filters, rewardType });
+  };
+
   const handleSortChange = (sortBy: SortOption) => {
     onFiltersChange({ ...filters, sortBy });
   };
@@ -47,6 +51,7 @@ export function FilterBar({ filters, categories, questCounts, onFiltersChange }:
       status: 'all',
       priority: 'all',
       favorite: 'all',
+      rewardType: 'all',
       sortBy: 'dateAdded',
     });
   };
@@ -57,6 +62,7 @@ export function FilterBar({ filters, categories, questCounts, onFiltersChange }:
     filters.status !== 'all' ||
     filters.priority !== 'all' ||
     filters.favorite !== 'all' ||
+    filters.rewardType !== 'all' ||
     filters.sortBy !== 'dateAdded';
 
   return (
@@ -152,6 +158,25 @@ export function FilterBar({ filters, categories, questCounts, onFiltersChange }:
               <option value="non-favorites">Regular</option>
             </select>
           </div>
+
+          {/* Reward Filter */}
+          <div className="flex items-center gap-2">
+            <Gift className="w-4 h-4 text-primary-400" />
+            <select
+              value={filters.rewardType}
+              onChange={(e) => handleRewardChange(e.target.value as FilterReward)}
+              className="px-4 py-2 bg-dark-700/50 border border-dark-600 rounded-lg
+                       text-gray-200 text-sm focus:outline-none focus:ring-2
+                       focus:ring-primary-500/50 focus:border-primary-500 transition-all
+                       cursor-pointer hover:bg-dark-600/50"
+            >
+              <option value="all">All Rewards</option>
+              <option value="gold">💰 Gold</option>
+              <option value="items">📦 Items</option>
+              <option value="high-value">✨ High Value (2g+)</option>
+              <option value="no-reward">No Rewards</option>
+            </select>
+          </div>
         </div>
 
         {/* Row 2: Sort & Clear */}
@@ -172,6 +197,7 @@ export function FilterBar({ filters, categories, questCounts, onFiltersChange }:
               <option value="category">Category</option>
               <option value="dateCompleted">Date Completed</option>
               <option value="priority">Priority</option>
+              <option value="reward">💰 Reward Value</option>
             </select>
           </div>
 
@@ -225,9 +251,26 @@ export function FilterBar({ filters, categories, questCounts, onFiltersChange }:
               {filters.favorite === 'favorites' ? 'Favorites Only' : 'Non-Favorites'}
             </span>
           )}
+          {filters.rewardType !== 'all' && (
+            <span className="px-3 py-1 bg-yellow-500/20 border border-yellow-500/30 rounded-full text-yellow-300">
+              Reward: {
+                filters.rewardType === 'gold' ? '💰 Gold' :
+                filters.rewardType === 'items' ? '📦 Items' :
+                filters.rewardType === 'high-value' ? '✨ High Value' :
+                'No Rewards'
+              }
+            </span>
+          )}
           {filters.sortBy !== 'dateAdded' && (
             <span className="px-3 py-1 bg-rare/20 border border-rare/30 rounded-full text-rare">
-              Sort: {filters.sortBy === 'name' ? 'Name' : filters.sortBy === 'category' ? 'Category' : filters.sortBy === 'dateCompleted' ? 'Date Completed' : 'Priority'}
+              Sort: {
+                filters.sortBy === 'name' ? 'Name' :
+                filters.sortBy === 'category' ? 'Category' :
+                filters.sortBy === 'dateCompleted' ? 'Date Completed' :
+                filters.sortBy === 'priority' ? 'Priority' :
+                filters.sortBy === 'reward' ? '💰 Reward Value' :
+                'Date Added'
+              }
             </span>
           )}
         </motion.div>

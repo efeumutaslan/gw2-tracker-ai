@@ -1,7 +1,8 @@
-export type SortOption = 'name' | 'dateAdded' | 'category' | 'dateCompleted' | 'priority';
+export type SortOption = 'name' | 'dateAdded' | 'category' | 'dateCompleted' | 'priority' | 'reward';
 export type FilterStatus = 'all' | 'active' | 'completed';
 export type FilterPriority = 'all' | 'high' | 'medium' | 'low';
 export type FilterFavorite = 'all' | 'favorites' | 'non-favorites';
+export type FilterReward = 'all' | 'gold' | 'items' | 'high-value' | 'no-reward';
 
 export interface QuestFilters {
   searchQuery: string;
@@ -9,7 +10,28 @@ export interface QuestFilters {
   status: FilterStatus;
   priority: FilterPriority;
   favorite: FilterFavorite;
+  rewardType: FilterReward;
   sortBy: SortOption;
+}
+
+// Helper function to extract reward info from quest
+function getRewardInfo(quest: any) {
+  const notes = quest.notes || (quest as any).questTemplate?.notes || '';
+  const rewardMatch = notes.match(/^Reward: (.+?)(?:\n\n|$)/)?.[1];
+
+  if (!rewardMatch) return { hasReward: false, hasGold: false, hasItems: false, goldValue: 0 };
+
+  const hasGold = /\d+g|\d+\s*gold/i.test(rewardMatch);
+  const hasItems = /chest|box|key|bag|container|item|material|ore|wood|leather/i.test(rewardMatch);
+
+  // Extract gold value for high-value filtering
+  let goldValue = 0;
+  const goldMatch = rewardMatch.match(/(\d+)g/i);
+  if (goldMatch) {
+    goldValue = parseInt(goldMatch[1]);
+  }
+
+  return { hasReward: true, hasGold, hasItems, goldValue };
 }
 
 export function filterAndSortQuests(quests: any[], filters: QuestFilters): any[] {
@@ -52,11 +74,37 @@ export function filterAndSortQuests(quests: any[], filters: QuestFilters): any[]
     );
   }
 
+  // Apply reward filter
+  if (filters.rewardType !== 'all') {
+    filtered = filtered.filter((quest) => {
+      const rewardInfo = getRewardInfo(quest);
+
+      switch (filters.rewardType) {
+        case 'gold':
+          return rewardInfo.hasGold;
+        case 'items':
+          return rewardInfo.hasItems;
+        case 'high-value':
+          return rewardInfo.goldValue >= 2; // 2g or more
+        case 'no-reward':
+          return !rewardInfo.hasReward;
+        default:
+          return true;
+      }
+    });
+  }
+
   // Apply sorting
   filtered.sort((a, b) => {
     switch (filters.sortBy) {
       case 'name':
         return a.name.localeCompare(b.name);
+
+      case 'reward':
+        const rewardA = getRewardInfo(a);
+        const rewardB = getRewardInfo(b);
+        // Sort by gold value descending
+        return rewardB.goldValue - rewardA.goldValue;
 
       case 'dateAdded':
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
