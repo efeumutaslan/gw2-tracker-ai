@@ -204,6 +204,24 @@ export const materialProgress = pgTable('material_progress', {
   userIdIdx: index('material_progress_user_id_idx').on(table.userId),
 }));
 
+// Legendary Progress History - tracks snapshots of legendary crafting progress over time
+export const legendaryProgressHistory = pgTable('legendary_progress_history', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  legendaryId: varchar('legendary_id', { length: 100 }).notNull(), // e.g., 'eternity', 'sunrise'
+  progressPercentage: integer('progress_percentage').notNull().default(0), // 0-100
+  materialsObtained: integer('materials_obtained').notNull().default(0),
+  totalMaterials: integer('total_materials').notNull().default(0),
+  totalValueCopper: integer('total_value_copper').default(0), // estimated value in copper
+  snapshotType: varchar('snapshot_type', { length: 20 }).default('auto'), // 'auto', 'manual', 'milestone'
+  snapshotAt: timestamp('snapshot_at', { withTimezone: true }).defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+}, (table) => ({
+  userLegendaryIdx: index('legendary_progress_history_user_legendary_idx').on(table.userId, table.legendaryId, table.snapshotAt),
+  userIdIdx: index('legendary_progress_history_user_id_idx').on(table.userId),
+  snapshotAtIdx: index('legendary_progress_history_snapshot_at_idx').on(table.snapshotAt),
+}));
+
 // Types
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
@@ -223,3 +241,5 @@ export type MaterialReserve = typeof materialReserves.$inferSelect;
 export type NewMaterialReserve = typeof materialReserves.$inferInsert;
 export type MaterialProgress = typeof materialProgress.$inferSelect;
 export type NewMaterialProgress = typeof materialProgress.$inferInsert;
+export type LegendaryProgressHistory = typeof legendaryProgressHistory.$inferSelect;
+export type NewLegendaryProgressHistory = typeof legendaryProgressHistory.$inferInsert;

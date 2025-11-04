@@ -276,6 +276,43 @@ export function QuestList({ quests: initialQuests, filters, isLoading, onRefresh
     }
   };
 
+  const handleCompleteAllCharacters = async (
+    questTemplateId: string,
+    timeSpent?: number,
+    goldEarned?: string
+  ) => {
+    try {
+      const response = await fetch('/api/quests/complete-all-characters', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          questTemplateId,
+          timeSpent,
+          goldEarned,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to complete quests');
+      }
+
+      // Fire confetti celebration!
+      fireConfetti();
+
+      // Show success message
+      showToast(
+        'success',
+        `Completed for ${data.completedCount} character${data.completedCount > 1 ? 's' : ''}! 🎉`
+      );
+
+      if (onRefresh) onRefresh();
+    } catch (error) {
+      showToast('error', error instanceof Error ? error.message : 'Failed to complete quests');
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center py-12">
@@ -313,6 +350,7 @@ export function QuestList({ quests: initialQuests, filters, isLoading, onRefresh
             onDelete={handleDelete}
             onToggleFavorite={handleToggleFavorite}
             onPriorityChange={handlePriorityChange}
+            onCompleteAllCharacters={handleCompleteAllCharacters}
           />
         ))}
       </div>

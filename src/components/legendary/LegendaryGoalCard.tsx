@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { Card, CardBody } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -76,10 +77,13 @@ export function LegendaryGoalCard({ goal, onDelete, onComplete }: LegendaryGoalC
             <div className="flex-shrink-0">
               {legendary?.iconUrl ? (
                 <div className="relative">
-                  <img
+                  <Image
                     src={legendary.iconUrl}
                     alt={goal.legendaryName}
+                    width={80}
+                    height={80}
                     className="w-20 h-20 rounded-lg border-2 border-legendary/50"
+                    unoptimized
                   />
                   {goal.isCompleted && (
                     <div className="absolute -top-2 -right-2 bg-legendary rounded-full p-1">

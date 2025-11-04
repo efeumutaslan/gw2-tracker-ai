@@ -237,3 +237,140 @@ export async function getQuestCompletionHistory(userId: string, limit: number = 
     limit,
   });
 }
+
+// ==========================================
+// Legendary Tracking Queries
+// ==========================================
+
+export async function getUserLegendaries(userId: string) {
+  return db.query.userLegendaries.findMany({
+    where: eq(schema.userLegendaries.userId, userId),
+    orderBy: desc(schema.userLegendaries.updatedAt),
+  });
+}
+
+export async function getUserLegendaryById(legendaryId: string) {
+  return db.query.userLegendaries.findFirst({
+    where: eq(schema.userLegendaries.id, legendaryId),
+  });
+}
+
+export async function getUserLegendaryByLegendaryId(userId: string, legendaryId: string) {
+  return db.query.userLegendaries.findFirst({
+    where: and(
+      eq(schema.userLegendaries.userId, userId),
+      eq(schema.userLegendaries.legendaryId, legendaryId)
+    ),
+  });
+}
+
+export async function createUserLegendary(data: schema.NewUserLegendary) {
+  const [legendary] = await db.insert(schema.userLegendaries)
+    .values(data)
+    .returning();
+  return legendary;
+}
+
+export async function updateUserLegendary(legendaryId: string, data: Partial<schema.NewUserLegendary>) {
+  const [legendary] = await db.update(schema.userLegendaries)
+    .set({ ...data, updatedAt: new Date() })
+    .where(eq(schema.userLegendaries.id, legendaryId))
+    .returning();
+  return legendary;
+}
+
+export async function deleteUserLegendary(legendaryId: string) {
+  await db.delete(schema.userLegendaries).where(eq(schema.userLegendaries.id, legendaryId));
+}
+
+// Material Reserves
+export async function getMaterialReservesByUserId(userId: string) {
+  return db.query.materialReserves.findMany({
+    where: eq(schema.materialReserves.userId, userId),
+  });
+}
+
+export async function getMaterialReservesByLegendaryId(legendaryId: string) {
+  return db.query.materialReserves.findMany({
+    where: eq(schema.materialReserves.userLegendaryId, legendaryId),
+  });
+}
+
+export async function upsertMaterialReserve(data: schema.NewMaterialReserve) {
+  const [reserve] = await db.insert(schema.materialReserves)
+    .values(data)
+    .onConflictDoUpdate({
+      target: [schema.materialReserves.userLegendaryId, schema.materialReserves.itemName],
+      set: {
+        quantityReserved: data.quantityReserved,
+        updatedAt: new Date(),
+      },
+    })
+    .returning();
+  return reserve;
+}
+
+export async function deleteMaterialReservesByLegendaryId(legendaryId: string) {
+  await db.delete(schema.materialReserves)
+    .where(eq(schema.materialReserves.userLegendaryId, legendaryId));
+}
+
+// Material Progress
+export async function getMaterialProgressByLegendaryId(legendaryId: string) {
+  return db.query.materialProgress.findMany({
+    where: eq(schema.materialProgress.userLegendaryId, legendaryId),
+  });
+}
+
+export async function upsertMaterialProgress(data: schema.NewMaterialProgress) {
+  const [progress] = await db.insert(schema.materialProgress)
+    .values(data)
+    .onConflictDoUpdate({
+      target: [
+        schema.materialProgress.userLegendaryId,
+        schema.materialProgress.componentId,
+        schema.materialProgress.itemName,
+      ],
+      set: {
+        completed: data.completed,
+        completedAt: data.completed ? new Date() : null,
+        updatedAt: new Date(),
+      },
+    })
+    .returning();
+  return progress;
+}
+
+export async function deleteMaterialProgressByLegendaryId(legendaryId: string) {
+  await db.delete(schema.materialProgress)
+    .where(eq(schema.materialProgress.userLegendaryId, legendaryId));
+}
+
+// Progress History
+export async function getProgressHistory(userId: string, legendaryId: string, limit: number = 30) {
+  return db.query.legendaryProgressHistory.findMany({
+    where: and(
+      eq(schema.legendaryProgressHistory.userId, userId),
+      eq(schema.legendaryProgressHistory.legendaryId, legendaryId)
+    ),
+    orderBy: desc(schema.legendaryProgressHistory.snapshotAt),
+    limit,
+  });
+}
+
+export async function createProgressSnapshot(data: schema.NewLegendaryProgressHistory) {
+  const [snapshot] = await db.insert(schema.legendaryProgressHistory)
+    .values(data)
+    .returning();
+  return snapshot;
+}
+
+export async function deleteProgressHistoryByLegendaryId(userId: string, legendaryId: string) {
+  await db.delete(schema.legendaryProgressHistory)
+    .where(
+      and(
+        eq(schema.legendaryProgressHistory.userId, userId),
+        eq(schema.legendaryProgressHistory.legendaryId, legendaryId)
+      )
+    );
+}

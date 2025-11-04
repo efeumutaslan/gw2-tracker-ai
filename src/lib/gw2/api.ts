@@ -234,3 +234,93 @@ export async function getAggregatedMaterials(apiKey: string): Promise<{
 
   return { data: materialsMap };
 }
+
+/**
+ * Get item details from GW2 API (no auth required)
+ * Returns item information including name, description, icon
+ */
+export async function getItemDetails(itemIds: number[]): Promise<{
+  data?: Array<{
+    id: number;
+    name: string;
+    description?: string;
+    icon?: string;
+    type?: string;
+    rarity?: string;
+    level?: number;
+    vendor_value?: number;
+  }>;
+  error?: string;
+}> {
+  try {
+    if (itemIds.length === 0) {
+      return { data: [] };
+    }
+
+    const idsParam = itemIds.join(',');
+    const url = `${GW2_API_BASE_URL}/items?ids=${idsParam}`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+      },
+      next: { revalidate: 3600 }, // Cache for 1 hour
+    });
+
+    if (!response.ok) {
+      if (response.status === 429) {
+        return { error: 'Rate limit exceeded. Please try again later.' };
+      }
+      return { error: 'Failed to fetch item details' };
+    }
+
+    const data = await response.json();
+    return { data };
+  } catch (error) {
+    console.error('Get item details error:', error);
+    return { error: 'Failed to fetch item details' };
+  }
+}
+
+/**
+ * Get trading post prices for items (no auth required)
+ */
+export async function getItemPrices(itemIds: number[]): Promise<{
+  data?: Array<{
+    id: number;
+    buys: { quantity: number; unit_price: number };
+    sells: { quantity: number; unit_price: number };
+  }>;
+  error?: string;
+}> {
+  try {
+    if (itemIds.length === 0) {
+      return { data: [] };
+    }
+
+    const idsParam = itemIds.join(',');
+    const url = `${GW2_API_BASE_URL}/commerce/prices?ids=${idsParam}`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+      },
+      next: { revalidate: 300 }, // Cache for 5 minutes
+    });
+
+    if (!response.ok) {
+      if (response.status === 429) {
+        return { error: 'Rate limit exceeded. Please try again later.' };
+      }
+      return { error: 'Failed to fetch item prices' };
+    }
+
+    const data = await response.json();
+    return { data };
+  } catch (error) {
+    console.error('Get item prices error:', error);
+    return { error: 'Failed to fetch item prices' };
+  }
+}

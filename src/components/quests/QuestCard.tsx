@@ -35,12 +35,14 @@ interface QuestCardProps {
     nextResetAt: Date;
     isFavorite?: boolean;
     priority?: 'low' | 'medium' | 'high';
+    questTemplateId?: string;
   };
   onToggleComplete: (questId: string, timeSpent?: number, goldEarned?: string) => void;
   onEdit?: (questId: string) => void;
   onDelete?: (questId: string) => void;
   onToggleFavorite?: (questId: string, isFavorite: boolean) => void;
   onPriorityChange?: (questId: string, priority: 'low' | 'medium' | 'high') => void;
+  onCompleteAllCharacters?: (questTemplateId: string, timeSpent?: number, goldEarned?: string) => void;
 }
 
 // Animation variants
@@ -80,7 +82,7 @@ const timerVariants = {
   }
 };
 
-export function QuestCard({ quest, onToggleComplete, onEdit, onDelete, onToggleFavorite, onPriorityChange }: QuestCardProps) {
+export function QuestCard({ quest, onToggleComplete, onEdit, onDelete, onToggleFavorite, onPriorityChange, onCompleteAllCharacters }: QuestCardProps) {
   const [timeLeft, setTimeLeft] = useState('');
   const [isUrgent, setIsUrgent] = useState(false);
   const [showPriorityMenu, setShowPriorityMenu] = useState(false);
@@ -93,6 +95,8 @@ export function QuestCard({ quest, onToggleComplete, onEdit, onDelete, onToggleF
   const questDescription = questData.description || quest.description;
   const questNotes = questData.notes || quest.notes;
   const questFrequency = questData.frequency || quest.frequency || 'daily';
+  const isCharacterBound = questData.isCharacterBound || false;
+  const questTemplateId = (quest as any).questTemplateId || quest.questTemplateId;
 
   // Safe defaults
   const frequency = questFrequency;
@@ -138,6 +142,12 @@ export function QuestCard({ quest, onToggleComplete, onEdit, onDelete, onToggleF
       onToggleComplete(quest.id);
     } else {
       onToggleComplete(quest.id, quest.estimatedDurationMinutes);
+    }
+  };
+
+  const handleCompleteAllCharacters = () => {
+    if (onCompleteAllCharacters && questTemplateId) {
+      onCompleteAllCharacters(questTemplateId, quest.estimatedDurationMinutes);
     }
   };
 
@@ -331,6 +341,19 @@ export function QuestCard({ quest, onToggleComplete, onEdit, onDelete, onToggleF
             >
               {quest.isCompleted ? 'Undo' : 'Complete'}
             </Button>
+
+            {/* Complete All Characters Button - Only show for character-bound, incomplete quests */}
+            {isCharacterBound && !quest.isCompleted && onCompleteAllCharacters && (
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={handleCompleteAllCharacters}
+                className="w-full min-w-[100px] text-xs"
+                title="Complete this quest for all your characters"
+              >
+                All Characters
+              </Button>
+            )}
 
             {quest.waypointCode && (
               <WaypointButton waypointCode={quest.waypointCode} />

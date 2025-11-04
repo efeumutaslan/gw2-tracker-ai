@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Search, Filter } from 'lucide-react';
 import { Card, CardBody } from '@/components/ui/Card';
@@ -169,10 +170,13 @@ export function LegendarySelector({ onSelect, onClose }: LegendarySelectorProps)
                         <div className="flex items-center gap-4">
                           {/* Icon */}
                           {legendary.iconUrl ? (
-                            <img
+                            <Image
                               src={legendary.iconUrl}
                               alt={legendary.name}
+                              width={64}
+                              height={64}
                               className="w-16 h-16 rounded border-2 border-legendary/50"
+                              unoptimized
                             />
                           ) : (
                             <div className="w-16 h-16 rounded border-2 border-legendary/50 bg-legendary/10 flex items-center justify-center text-2xl">

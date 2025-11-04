@@ -142,6 +142,7 @@ export const ETERNITY_DATA: Omit<LegendaryWeapon, 'id' | 'overallProgress' | 'to
       progress: 0,
       materials: [
         {
+          itemId: 24295,
           itemName: 'Bloodstone Shard',
           quantity: 2,
           owned: 0,
@@ -173,6 +174,7 @@ export const ETERNITY_DATA: Omit<LegendaryWeapon, 'id' | 'overallProgress' | 'to
           ],
         },
         {
+          itemId: 19925,
           itemName: 'Obsidian Shard',
           quantity: 500,
           owned: 0,
@@ -298,6 +300,7 @@ export const ETERNITY_DATA: Omit<LegendaryWeapon, 'id' | 'overallProgress' | 'to
           ],
         },
         {
+          itemId: 19721,
           itemName: 'Glob of Ectoplasm',
           quantity: 500,
           owned: 0,

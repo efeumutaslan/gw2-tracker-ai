@@ -49,4 +49,7 @@ prisma/
 
 .vercel
 
-.vercel
+# Wiki data / knowledge base (local only)
+/wiki-data/
+/data/wiki/
+legendary-wiki-data.json

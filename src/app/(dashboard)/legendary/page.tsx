@@ -2,336 +2,260 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Sparkles, Plus, Target, TrendingUp, Trophy, Coins } from 'lucide-react';
-import { Card, CardBody } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
-import { useToast } from '@/components/ui/Toast';
-import { LegendaryGoalCard } from '@/components/legendary/LegendaryGoalCard';
-import { LegendarySelector } from '@/components/legendary/LegendarySelector';
-import { NotificationSettings } from '@/components/legendary/NotificationSettings';
-import { LegendaryComparisonView } from '@/components/legendary/LegendaryComparisonView';
-import { notificationService } from '@/lib/services/notificationService';
-
-interface LegendaryGoal {
-  id: string;
-  legendaryId: number;
-  legendaryName: string;
-  legendaryType: string;
-  legendaryTier: string;
-  targetQuantity: number;
-  isCompleted: boolean;
-  notes?: string;
-  startedAt: string;
-  completedAt?: string;
-}
+import { Sparkles, Search, Filter, Star } from 'lucide-react';
+import Link from 'next/link';
+import { LEGENDARY_WEAPONS } from '@/lib/data/legendaryWeapons';
+import { Input } from '@/components/ui/Input';
+import { Select } from '@/components/ui/Select';
 
 export default function LegendaryPage() {
-  const [goals, setGoals] = useState<LegendaryGoal[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [showSelector, setShowSelector] = useState(false);
-  const { showToast } = useToast();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedGeneration, setSelectedGeneration] = useState('all');
+  const [selectedType, setSelectedType] = useState('all');
+  const [showOnlyTracked, setShowOnlyTracked] = useState(false);
+  const [trackedLegendaries, setTrackedLegendaries] = useState<string[]>([]);
 
+  // Fetch tracked legendaries
   useEffect(() => {
-    fetchGoals();
+    const fetchTrackedLegendaries = async () => {
+      try {
+        const response = await fetch('/api/legendary/track');
+        if (response.ok) {
+          const data = await response.json();
+          setTrackedLegendaries(data.trackedLegendaries || []);
+        }
+      } catch (error) {
+        console.error('Failed to fetch tracked legendaries:', error);
+      }
+    };
+
+    fetchTrackedLegendaries();
   }, []);
 
-  const fetchGoals = async () => {
-    try {
-      const response = await fetch('/api/legendary-goals');
-      if (!response.ok) throw new Error('Failed to fetch goals');
+  // Filter legendaries
+  const filteredLegendaries = LEGENDARY_WEAPONS.filter((legendary) => {
+    const matchesSearch = legendary.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         legendary.description?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesGeneration = selectedGeneration === 'all' || legendary.generation.toString() === selectedGeneration;
+    const matchesType = selectedType === 'all' || legendary.type === selectedType;
+    const matchesTracked = !showOnlyTracked || trackedLegendaries.includes(legendary.id);
 
-      const data = await response.json();
-      setGoals(data);
-    } catch (error) {
-      showToast('error', 'Failed to load legendary goals');
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    return matchesSearch && matchesGeneration && matchesType && matchesTracked;
+  });
 
-  const handleAddGoal = async (legendaryId: number, legendaryName: string, legendaryType: string, legendaryTier: string) => {
-    try {
-      const response = await fetch('/api/legendary-goals', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          legendaryId,
-          legendaryName,
-          legendaryType,
-          legendaryTier,
-          targetQuantity: 1,
-        }),
-      });
+  // Get unique weapon types
+  const weaponTypes = Array.from(new Set(LEGENDARY_WEAPONS.map(l => l.type))).sort();
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to create goal');
-      }
+  const generationOptions = [
+    { value: 'all', label: 'All Generations' },
+    { value: '1', label: 'Generation 1' },
+    { value: '2', label: 'Generation 2' },
+    { value: '3', label: 'Generation 3' },
+  ];
 
-      showToast('success', `Added ${legendaryName} to your legendary goals!`);
-      await fetchGoals();
-      setShowSelector(false);
-    } catch (error) {
-      showToast('error', error instanceof Error ? error.message : 'Failed to add goal');
-    }
-  };
-
-  const handleDeleteGoal = async (goalId: string) => {
-    try {
-      const response = await fetch(`/api/legendary-goals?id=${goalId}`, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) throw new Error('Failed to delete goal');
-
-      showToast('success', 'Legendary goal removed');
-      await fetchGoals();
-    } catch (error) {
-      showToast('error', 'Failed to remove goal');
-    }
-  };
-
-  const handleCompleteGoal = async (goalId: string) => {
-    try {
-      // Find the goal to get the name
-      const goal = goals.find(g => g.id === goalId);
-
-      const response = await fetch('/api/legendary-goals', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          goalId,
-          isCompleted: true,
-        }),
-      });
-
-      if (!response.ok) throw new Error('Failed to complete goal');
-
-      showToast('success', 'Congratulations! Legendary completed!');
-
-      // Send notification
-      if (goal) {
-        await notificationService.notifyLegendaryComplete(goal.legendaryName);
-      }
-
-      await fetchGoals();
-    } catch (error) {
-      showToast('error', 'Failed to update goal');
-    }
-  };
-
-  // Calculate stats
-  const activeGoals = goals.filter(g => !g.isCompleted);
-  const completedGoals = goals.filter(g => g.isCompleted);
-  const totalGoals = goals.length;
-  const completionRate = totalGoals > 0 ? Math.round((completedGoals.length / totalGoals) * 100) : 0;
+  const typeOptions = [
+    { value: 'all', label: 'All Weapon Types' },
+    ...weaponTypes.map(type => ({
+      value: type,
+      label: type.charAt(0).toUpperCase() + type.slice(1),
+    })),
+  ];
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="glass p-8 rounded-lg border border-legendary/30">
-        <div className="flex items-center gap-4 mb-3">
+        <div className="flex items-center gap-4">
           <div className="p-3 bg-legendary/20 rounded-lg border border-legendary/30">
             <Sparkles className="w-8 h-8 text-legendary" />
           </div>
           <div>
             <h1 className="text-4xl font-bold text-gray-100 tracking-tight">
-              Legendary Tracker
+              Legendary Weapons
             </h1>
-            <div className="flex items-center gap-2 mt-1">
-              <Trophy className="w-4 h-4 text-legendary" />
-              <p className="text-gray-400">Track your legendary weapon and armor crafting progress</p>
-            </div>
+            <p className="text-gray-400 mt-1">
+              Track your legendary weapon crafting with detailed material breakdowns
+            </p>
           </div>
         </div>
       </div>
 
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Active Goals */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0 }}
-        >
-          <Card className="glass border-primary-500/30">
-            <CardBody>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-400 mb-1">Active Goals</p>
-                  <p className="text-3xl font-bold text-primary-400">{activeGoals.length}</p>
-                </div>
-                <div className="p-3 bg-primary-500/20 rounded-lg">
-                  <Target className="w-6 h-6 text-primary-400" />
-                </div>
-              </div>
-            </CardBody>
-          </Card>
-        </motion.div>
+      {/* Filters */}
+      <div className="glass p-4 rounded-lg border border-dark-600/50">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {/* Search */}
+          <div className="relative">
+            <Input
+              placeholder="Search legendary weapons..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          </div>
 
-        {/* Completed */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-        >
-          <Card className="glass border-legendary/30">
-            <CardBody>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-400 mb-1">Completed</p>
-                  <p className="text-3xl font-bold text-legendary">{completedGoals.length}</p>
-                </div>
-                <div className="p-3 bg-legendary/20 rounded-lg">
-                  <Trophy className="w-6 h-6 text-legendary" />
-                </div>
-              </div>
-            </CardBody>
-          </Card>
-        </motion.div>
+          {/* Generation Filter */}
+          <Select
+            options={generationOptions}
+            value={selectedGeneration}
+            onChange={(e) => setSelectedGeneration(e.target.value)}
+          />
 
-        {/* Completion Rate */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          <Card className="glass border-primary-500/30">
-            <CardBody>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-400 mb-1">Completion Rate</p>
-                  <p className="text-3xl font-bold text-gray-200">{completionRate}%</p>
-                </div>
-                <div className="p-3 bg-primary-500/20 rounded-lg">
-                  <TrendingUp className="w-6 h-6 text-primary-400" />
-                </div>
-              </div>
-            </CardBody>
-          </Card>
-        </motion.div>
+          {/* Type Filter */}
+          <Select
+            options={typeOptions}
+            value={selectedType}
+            onChange={(e) => setSelectedType(e.target.value)}
+          />
 
-        {/* Total Investment (placeholder) */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
-          <Card className="glass border-primary-500/30">
-            <CardBody>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-400 mb-1">Est. Investment</p>
-                  <p className="text-xl font-bold text-yellow-400">Coming Soon</p>
-                </div>
-                <div className="p-3 bg-yellow-500/20 rounded-lg">
-                  <Coins className="w-6 h-6 text-yellow-400" />
-                </div>
-              </div>
-            </CardBody>
-          </Card>
-        </motion.div>
-      </div>
-
-      {/* Notification Settings */}
-      <NotificationSettings />
-
-      {/* Comparison View - Only show if there are 2+ active goals */}
-      {activeGoals.length >= 2 && <LegendaryComparisonView goals={activeGoals} />}
-
-      {/* Add New Goal Button */}
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-200">Your Legendary Goals</h2>
-        <Button
-          onClick={() => setShowSelector(true)}
-          className="flex items-center gap-2"
-        >
-          <Plus className="w-4 h-4" />
-          Add Legendary Goal
-        </Button>
-      </div>
-
-      {/* Goals List */}
-      {isLoading ? (
-        <div className="text-center py-12">
-          <p className="text-gray-400">Loading your legendary goals...</p>
+          {/* Tracked Filter */}
+          <button
+            onClick={() => setShowOnlyTracked(!showOnlyTracked)}
+            className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg border transition-all ${
+              showOnlyTracked
+                ? 'bg-legendary/20 border-legendary/50 text-legendary'
+                : 'bg-dark-700 border-dark-600 text-gray-400 hover:border-dark-500'
+            }`}
+          >
+            <Star className={`w-4 h-4 ${showOnlyTracked ? 'fill-legendary' : ''}`} />
+            <span className="text-sm">Tracked Only</span>
+          </button>
         </div>
-      ) : activeGoals.length === 0 && completedGoals.length === 0 ? (
-        <Card className="glass border-primary-500/20">
-          <CardBody>
-            <div className="text-center py-12">
-              <Sparkles className="w-16 h-16 text-legendary mx-auto mb-4 opacity-50" />
-              <h3 className="text-xl font-bold text-gray-200 mb-2">No Legendary Goals Yet</h3>
-              <p className="text-gray-400 mb-6">
-                Start tracking your legendary crafting journey by adding your first goal!
-              </p>
-              <Button
-                onClick={() => setShowSelector(true)}
-                className="flex items-center gap-2 mx-auto"
-              >
-                <Plus className="w-4 h-4" />
-                Add Your First Legendary
-              </Button>
-            </div>
-          </CardBody>
-        </Card>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="glass p-4 rounded-lg border border-primary-500/30">
+          <p className="text-sm text-gray-400 mb-1">Total Legendaries</p>
+          <p className="text-3xl font-bold text-gray-200">{LEGENDARY_WEAPONS.length}</p>
+        </div>
+        <div className="glass p-4 rounded-lg border border-legendary/30">
+          <p className="text-sm text-gray-400 mb-1">Currently Tracking</p>
+          <p className="text-3xl font-bold text-legendary">{trackedLegendaries.length}</p>
+        </div>
+        <div className="glass p-4 rounded-lg border border-primary-500/30">
+          <p className="text-sm text-gray-400 mb-1">Filtered Results</p>
+          <p className="text-3xl font-bold text-gray-200">{filteredLegendaries.length}</p>
+        </div>
+      </div>
+
+      {/* Legendary Grid */}
+      {filteredLegendaries.length === 0 ? (
+        <div className="glass p-12 rounded-lg border border-dark-600/50 text-center">
+          <Filter className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+          <h3 className="text-xl font-bold text-gray-300 mb-2">No Results Found</h3>
+          <p className="text-gray-500">
+            Try adjusting your filters or search query
+          </p>
+        </div>
       ) : (
-        <div className="space-y-6">
-          {/* Active Goals */}
-          {activeGoals.length > 0 && (
-            <div>
-              <h3 className="text-lg font-semibold text-gray-300 mb-4">In Progress</h3>
-              <div className="grid gap-4">
-                {activeGoals.map((goal, index) => (
-                  <motion.div
-                    key={goal.id}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                  >
-                    <LegendaryGoalCard
-                      goal={goal}
-                      onDelete={() => handleDeleteGoal(goal.id)}
-                      onComplete={() => handleCompleteGoal(goal.id)}
-                    />
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Completed Goals */}
-          {completedGoals.length > 0 && (
-            <div>
-              <h3 className="text-lg font-semibold text-gray-300 mb-4">Completed</h3>
-              <div className="grid gap-4">
-                {completedGoals.map((goal, index) => (
-                  <motion.div
-                    key={goal.id}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                  >
-                    <LegendaryGoalCard
-                      goal={goal}
-                      onDelete={() => handleDeleteGoal(goal.id)}
-                    />
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          )}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredLegendaries.map((legendary, index) => (
+            <LegendaryCard
+              key={legendary.id}
+              legendary={legendary}
+              delay={index * 0.05}
+            />
+          ))}
         </div>
-      )}
-
-      {/* Legendary Selector Modal */}
-      {showSelector && (
-        <LegendarySelector
-          onSelect={handleAddGoal}
-          onClose={() => setShowSelector(false)}
-        />
       )}
     </div>
+  );
+}
+
+interface LegendaryCardProps {
+  legendary: {
+    id: string;
+    name: string;
+    type: string;
+    generation: number;
+    icon: string;
+    wikiLink: string;
+    description?: string;
+  };
+  delay: number;
+}
+
+function LegendaryCard({ legendary, delay }: LegendaryCardProps) {
+  const generationColors = {
+    1: 'border-yellow-500/30 bg-yellow-500/5',
+    2: 'border-orange-500/30 bg-orange-500/5',
+    3: 'border-purple-500/30 bg-purple-500/5',
+  };
+
+  const generationBadgeColors = {
+    1: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
+    2: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
+    3: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay }}
+    >
+      <Link href={`/legendary/${legendary.id}`}>
+        <div
+          className={`glass p-6 rounded-lg border ${
+            generationColors[legendary.generation as keyof typeof generationColors]
+          } hover:border-legendary/50 transition-all duration-300 cursor-pointer group h-full`}
+        >
+          {/* Icon and Generation Badge */}
+          <div className="relative mb-4">
+            <div className="w-20 h-20 mx-auto relative bg-legendary/10 rounded-lg flex items-center justify-center">
+              <img
+                src={legendary.icon}
+                alt={legendary.name}
+                className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300 drop-shadow-[0_0_15px_rgba(255,183,77,0.5)]"
+                crossOrigin="anonymous"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                  const parent = target.parentElement;
+                  if (parent && !parent.querySelector('.fallback-icon')) {
+                    const fallback = document.createElement('div');
+                    fallback.className = 'fallback-icon text-4xl';
+                    fallback.textContent = '✨';
+                    parent.appendChild(fallback);
+                  }
+                }}
+              />
+            </div>
+            <div
+              className={`absolute top-0 right-0 px-2 py-1 rounded text-xs font-bold border ${
+                generationBadgeColors[legendary.generation as keyof typeof generationBadgeColors]
+              }`}
+            >
+              Gen {legendary.generation}
+            </div>
+          </div>
+
+          {/* Name and Type */}
+          <div className="text-center mb-3">
+            <h3 className="text-lg font-bold text-legendary mb-1 group-hover:text-legendary/80 transition-colors">
+              {legendary.name}
+            </h3>
+            <p className="text-sm text-gray-400 capitalize">
+              {legendary.type}
+            </p>
+          </div>
+
+          {/* Description */}
+          {legendary.description && (
+            <p className="text-xs text-gray-500 text-center line-clamp-2">
+              {legendary.description}
+            </p>
+          )}
+
+          {/* Hover Effect */}
+          <div className="mt-4 pt-4 border-t border-dark-600/50">
+            <p className="text-xs text-center text-primary-400 opacity-0 group-hover:opacity-100 transition-opacity">
+              Click to view materials & progress →
+            </p>
+          </div>
+        </div>
+      </Link>
+    </motion.div>
   );
 }

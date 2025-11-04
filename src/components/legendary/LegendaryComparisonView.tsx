@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { Card, CardBody } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Trophy, TrendingUp, Clock, Target } from 'lucide-react';
@@ -121,10 +122,13 @@ export function LegendaryComparisonView({ goals }: LegendaryComparisonViewProps)
                   {/* Legendary Icon & Name */}
                   <div className="flex items-center gap-3 mb-3">
                     {legendary?.iconUrl ? (
-                      <img
+                      <Image
                         src={legendary.iconUrl}
                         alt={goal.legendaryName}
+                        width={48}
+                        height={48}
                         className="w-12 h-12 rounded border border-legendary/50"
+                        unoptimized
                       />
                     ) : (
                       <div className="w-12 h-12 rounded border border-legendary/50 bg-legendary/10 flex items-center justify-center text-xl">

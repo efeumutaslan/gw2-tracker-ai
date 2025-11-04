@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { Card, CardBody } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -191,10 +192,13 @@ export function MaterialProgressList({
                 <div className="flex items-start gap-3">
                   {/* Material Icon */}
                   {material.iconUrl ? (
-                    <img
+                    <Image
                       src={material.iconUrl}
                       alt={material.name}
+                      width={48}
+                      height={48}
                       className="w-12 h-12 rounded border border-primary-500/30"
+                      unoptimized
                     />
                   ) : (
                     <div className="w-12 h-12 rounded border border-primary-500/30 bg-primary-500/10 flex items-center justify-center">

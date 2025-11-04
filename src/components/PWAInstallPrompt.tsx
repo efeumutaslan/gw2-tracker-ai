@@ -27,7 +27,8 @@ export function PWAInstallPrompt() {
     }
 
     const handler = (e: Event) => {
-      e.preventDefault();
+      // Don't prevent default to avoid console warnings
+      // Store the event for later use
       setDeferredPrompt(e as BeforeInstallPromptEvent);
 
       // Show prompt after 30 seconds

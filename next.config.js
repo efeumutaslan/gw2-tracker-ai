@@ -122,6 +122,16 @@ const nextConfig = {
         hostname: 'render.guildwars2.com',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'wiki.guildwars2.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'dummyimage.com',
+        pathname: '/**',
+      },
     ],
   },
   webpack: (config) => {
