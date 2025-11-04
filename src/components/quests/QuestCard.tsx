@@ -87,12 +87,19 @@ export function QuestCard({ quest, onToggleComplete, onEdit, onDelete, onToggleF
   const cardRef = useRef(null);
   const isInView = useInView(cardRef, { once: true, margin: '-50px' });
 
+  // Handle questTemplate relation from API
+  const questData = (quest as any).questTemplate || quest;
+  const questName = questData.name || quest.name || 'Untitled Quest';
+  const questDescription = questData.description || quest.description;
+  const questNotes = questData.notes || quest.notes;
+  const questFrequency = questData.frequency || quest.frequency || 'daily';
+
   // Safe defaults
-  const frequency = quest.frequency || 'daily';
+  const frequency = questFrequency;
 
   // Extract reward from notes
-  const reward = quest.notes?.match(/^Reward: (.+?)(?:\n\n|$)/)?.[1];
-  const actualNotes = quest.notes?.replace(/^Reward: .+?\n\n/, '');
+  const reward = questNotes?.match(/^Reward: (.+?)(?:\n\n|$)/)?.[1];
+  const actualNotes = questNotes?.replace(/^Reward: .+?\n\n/, '');
 
   useEffect(() => {
     const updateTimer = () => {
@@ -211,7 +218,7 @@ export function QuestCard({ quest, onToggleComplete, onEdit, onDelete, onToggleF
 
               <div className="flex-1 min-w-0">
                 <h3 className={`text-lg font-semibold mb-2 leading-tight ${quest.isCompleted ? 'line-through text-gray-400' : 'text-white'}`}>
-                  {quest.name || 'Untitled Quest'}
+                  {questName}
                 </h3>
 
                 <div className="flex items-center gap-2 flex-wrap">
@@ -271,9 +278,9 @@ export function QuestCard({ quest, onToggleComplete, onEdit, onDelete, onToggleF
             </div>
 
             {/* Description */}
-            {quest.description && (
+            {questDescription && (
               <p className="text-sm text-gray-400 pl-9">
-                {quest.description}
+                {questDescription}
               </p>
             )}
 
