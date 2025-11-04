@@ -19,6 +19,9 @@ import {
   Timer,
   Star,
   Flag,
+  Coins,
+  Package,
+  Sparkles,
 } from 'lucide-react';
 
 interface QuestCardProps {
@@ -104,6 +107,40 @@ export function QuestCard({ quest, onToggleComplete, onEdit, onDelete, onToggleF
   // Extract reward from notes
   const reward = questNotes?.match(/^Reward: (.+?)(?:\n\n|$)/)?.[1];
   const actualNotes = questNotes?.replace(/^Reward: .+?\n\n/, '');
+
+  // Parse rewards into structured data
+  const parseRewards = (rewardText: string | undefined) => {
+    if (!rewardText) return null;
+
+    const rewards = {
+      gold: null as string | null,
+      items: [] as string[],
+      other: [] as string[],
+    };
+
+    // Match gold amounts (e.g., "2g", "50g 25s", "1g 50s 25c")
+    const goldMatch = rewardText.match(/(\d+g\s*(?:\d+s\s*)?(?:\d+c)?|\d+\s*gold?)/i);
+    if (goldMatch) {
+      rewards.gold = goldMatch[0];
+    }
+
+    // Split by commas or 'and' to find individual items
+    const parts = rewardText.split(/,|\sand\s/i).map(p => p.trim());
+    parts.forEach(part => {
+      if (!goldMatch || !part.includes(goldMatch[0])) {
+        // Check if it's an item (contains words like 'chest', 'box', 'key', etc.)
+        if (/chest|box|key|bag|container|item|material|ore|wood|leather/i.test(part)) {
+          rewards.items.push(part);
+        } else if (!goldMatch || part !== goldMatch[0]) {
+          rewards.other.push(part);
+        }
+      }
+    });
+
+    return rewards;
+  };
+
+  const parsedRewards = parseRewards(reward);
 
   useEffect(() => {
     const updateTimer = () => {
@@ -294,15 +331,56 @@ export function QuestCard({ quest, onToggleComplete, onEdit, onDelete, onToggleF
               </p>
             )}
 
-            {/* Quest Info */}
-            <div className="flex flex-wrap items-center gap-4 text-sm pl-9">
-              {reward && (
-                <div className="flex items-center gap-2 text-primary-400">
-                  <Gift className="w-4 h-4" />
-                  <span>{reward}</span>
+            {/* Reward Box - Styled prominently */}
+            {parsedRewards && (parsedRewards.gold || parsedRewards.items.length > 0 || parsedRewards.other.length > 0) && (
+              <div className="pl-9 mt-3">
+                <div className="glass rounded-lg border border-primary-500/30 bg-gradient-to-br from-primary-500/10 via-transparent to-purple-500/10 p-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Sparkles className="w-4 h-4 text-primary-400" />
+                    <span className="text-xs font-semibold text-primary-300 uppercase tracking-wider">Rewards</span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {parsedRewards.gold && (
+                      <motion.div
+                        initial={{ scale: 0.95, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-yellow-500/20 border border-yellow-500/30"
+                      >
+                        <Coins className="w-4 h-4 text-yellow-400" />
+                        <span className="text-sm font-medium text-yellow-300">{parsedRewards.gold}</span>
+                      </motion.div>
+                    )}
+                    {parsedRewards.items.map((item, idx) => (
+                      <motion.div
+                        key={idx}
+                        initial={{ scale: 0.95, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ delay: idx * 0.05 }}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-blue-500/20 border border-blue-500/30"
+                      >
+                        <Package className="w-4 h-4 text-blue-400" />
+                        <span className="text-sm text-blue-300">{item}</span>
+                      </motion.div>
+                    ))}
+                    {parsedRewards.other.map((other, idx) => (
+                      <motion.div
+                        key={idx}
+                        initial={{ scale: 0.95, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ delay: (parsedRewards.items.length + idx) * 0.05 }}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-purple-500/20 border border-purple-500/30"
+                      >
+                        <Gift className="w-4 h-4 text-purple-400" />
+                        <span className="text-sm text-purple-300">{other}</span>
+                      </motion.div>
+                    ))}
+                  </div>
                 </div>
-              )}
+              </div>
+            )}
 
+            {/* Quest Info */}
+            <div className="flex flex-wrap items-center gap-4 text-sm pl-9 mt-3">
               {quest.estimatedDurationMinutes && quest.estimatedDurationMinutes > 0 && (
                 <div className="flex items-center gap-2 text-gray-400">
                   <Clock className="w-4 h-4" />
