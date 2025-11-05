@@ -33,7 +33,11 @@
       "Bash(git reset:*)",
       "Bash(node run-progress-history-migration.js:*)",
       "Bash(node download-legendary-icons.js:*)",
-      "Bash(node update-icon-paths.js:*)"
+      "Bash(node update-icon-paths.js:*)",
+      "Bash(npx tsx:*)",
+      "Bash(timeout 10 bash:*)",
+      "Bash(python -m json.tool:*)",
+      "Bash(node:*)"
     ],
     "deny": [],
     "ask": []
