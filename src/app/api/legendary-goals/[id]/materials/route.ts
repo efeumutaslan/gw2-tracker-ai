@@ -1,5 +1,10 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
+import { getUserApiKey, ensureUserExists } from '@/lib/db/queries';
+import { decrypt } from '@/lib/crypto/encryption';
+import { getAllInventoryData, countItemAcrossInventories } from '@/lib/gw2/account';
+
+export const dynamic = 'force-dynamic';
 
 // GET - Fetch material progress for a specific legendary goal with inventory comparison
 export async function GET(
@@ -19,6 +24,9 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // Ensure user exists in database
+    await ensureUserExists(user.id, user.email!);
+
     const goalId = params.id;
 
     // Verify goal belongs to user
@@ -36,66 +44,41 @@ export async function GET(
       );
     }
 
-    // Get user's API key
-    const { data: apiKeyData } = await supabase
-      .from('user_api_keys')
-      .select('api_key')
-      .eq('user_id', user.id)
-      .single();
+    // Get user's encrypted API key
+    const apiKeyData = await getUserApiKey(user.id);
 
     let inventoryData: { [itemId: number]: number } = {};
 
     // If user has API key, fetch inventory from GW2 API
-    if (apiKeyData?.api_key) {
+    if (apiKeyData) {
       try {
-        // Fetch account materials
-        const materialsResponse = await fetch(
-          'https://api.guildwars2.com/v2/account/materials',
-          {
-            headers: { Authorization: `Bearer ${apiKeyData.api_key}` },
-          }
-        );
+        // Decrypt API key
+        const apiKey = decrypt({
+          encrypted: apiKeyData.apiKeyEncrypted,
+          iv: apiKeyData.apiKeyIv,
+          authTag: apiKeyData.apiKeyAuthTag,
+        });
 
-        if (materialsResponse.ok) {
-          const materials = await materialsResponse.json();
-          materials.forEach((mat: { id: number; count: number }) => {
-            inventoryData[mat.id] = mat.count;
-          });
-        }
+        // Fetch all inventory data at once
+        const { materials, bank, inventory } = await getAllInventoryData(apiKey);
 
-        // Fetch account bank
-        const bankResponse = await fetch(
-          'https://api.guildwars2.com/v2/account/bank',
-          {
-            headers: { Authorization: `Bearer ${apiKeyData.api_key}` },
-          }
-        );
+        // Aggregate counts across all inventories
+        const itemIds = new Set<number>();
 
-        if (bankResponse.ok) {
-          const bank = await bankResponse.json();
-          bank.forEach((slot: any) => {
-            if (slot && slot.id) {
-              inventoryData[slot.id] = (inventoryData[slot.id] || 0) + slot.count;
-            }
-          });
-        }
+        // Collect all item IDs
+        materials.forEach(mat => itemIds.add(mat.id));
+        bank.forEach(item => itemIds.add(item.id));
+        inventory.forEach(item => itemIds.add(item.id));
 
-        // Fetch shared inventory
-        const sharedResponse = await fetch(
-          'https://api.guildwars2.com/v2/account/inventory',
-          {
-            headers: { Authorization: `Bearer ${apiKeyData.api_key}` },
-          }
-        );
-
-        if (sharedResponse.ok) {
-          const shared = await sharedResponse.json();
-          shared.forEach((slot: any) => {
-            if (slot && slot.id) {
-              inventoryData[slot.id] = (inventoryData[slot.id] || 0) + slot.count;
-            }
-          });
-        }
+        // Count each item across all inventories
+        itemIds.forEach(itemId => {
+          inventoryData[itemId] = countItemAcrossInventories(
+            itemId,
+            materials,
+            bank,
+            inventory
+          );
+        });
       } catch (error) {
         console.error('Error fetching GW2 inventory:', error);
       }
@@ -105,7 +88,7 @@ export async function GET(
       goalId,
       legendaryName: goal.legendary_name,
       inventoryData,
-      hasApiKey: !!apiKeyData?.api_key,
+      hasApiKey: !!apiKeyData,
     });
   } catch (error) {
     console.error('Unexpected error:', error);
