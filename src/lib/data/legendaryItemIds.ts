@@ -25,13 +25,11 @@ export const LEGENDARY_ITEM_IDS: Record<string, number> = {
   'frenzy': 30700,
   'the_moot': 30691,
 
-  // Generation 2 - Heart of Thorns Legendaries
+  // Generation 2 - Heart of Thorns & Path of Fire Legendaries
   'nevermore': 76158,
   'astralaria': 71383,
   'h_o_p_e': 74155,
   'chuka_and_champawat': 75624,
-
-  // Generation 3 - Path of Fire Legendaries
   'exordium': 95808,
   'sharur': 95684,
   'claw_of_the_khan-ur': 96028,
@@ -43,6 +41,24 @@ export const LEGENDARY_ITEM_IDS: Record<string, number> = {
   'shooshadoo': 97165,
   'hms_divinity': 97783,
   'the_shining_blade': 95612,
+
+  // Generation 3 - End of Dragons Legendaries (Aurene)
+  'aurenes_bite': 97077,
+  'aurenes_claw': 97138,
+  'aurenes_flight': 96937,
+  'aurenes_gaze': 97590,
+  'aurenes_persuasion': 97165,
+  'aurenes_proof': 96827,
+  'aurenes_scale': 97099,
+  'aurenes_tail': 97783,
+  'aurenes_talons': 96652,
+  'aurenes_voice': 97829,
+  'aurenes_weight': 96203,
+  'aurenes_wing': 97217,
+  'aurenes_wisdom': 97413,
+  'celestial_compass': 96028,
+  'dragons_breath': 96356,
+  'dragonsblood': 96722,
 };
 
 /**

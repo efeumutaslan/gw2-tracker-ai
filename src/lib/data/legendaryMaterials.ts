@@ -1027,6 +1027,406 @@ export const CLAW_OF_KHAN_UR_MATERIALS: LegendaryMaterialData = {
   ],
 };
 
+// GENERATION 3 LEGENDARY WEAPONS (End of Dragons - Aurene)
+
+// Common materials for Gen 3
+const GIFT_OF_AURENE_LEGEND: ComponentRequirement = {
+  id: 'gift_of_aurene_legend',
+  name: "Gift of Aurene's Legend",
+  materials: [
+    { id: 96722, name: "Aurene's Might", quantity: 1, rarity: 'Exotic' },
+    { id: 96827, name: "Aurene's Magic", quantity: 1, rarity: 'Exotic' },
+    { id: 97099, name: 'Mystic Clover', quantity: 77, rarity: 'Exotic' },
+    { id: 96937, name: 'Prismatic Jade', quantity: 250, rarity: 'Rare' },
+  ],
+};
+
+// Note: Gen 3 legendaries are simplified - they don't have detailed breakdowns
+// in the game like Gen 1/2. Materials are primarily obtained through EoD content.
+export const AURENES_BITE_MATERIALS: LegendaryMaterialData = {
+  legendaryId: 'aurenes_bite',
+  legendaryName: "Aurene's Bite",
+  generation: 3,
+  weaponType: 'Dagger',
+  components: [
+    GIFT_OF_AURENE_LEGEND,
+    {
+      id: 'gift_of_aurenes_bite',
+      name: "Gift of Aurene's Bite",
+      materials: [
+        { id: 97077, name: "Gift of Aurene's Bite", quantity: 1, rarity: 'Exotic' },
+      ],
+    },
+    {
+      id: 'precursor_aurene_bite',
+      name: "Aurene's Fang (Precursor)",
+      materials: [
+        { id: 97076, name: "Aurene's Fang", quantity: 1, rarity: 'Ascended' },
+      ],
+    },
+  ],
+};
+
+export const AURENES_CLAW_MATERIALS: LegendaryMaterialData = {
+  legendaryId: 'aurenes_claw',
+  legendaryName: "Aurene's Claw",
+  generation: 3,
+  weaponType: 'Pistol',
+  components: [
+    GIFT_OF_AURENE_LEGEND,
+    {
+      id: 'gift_of_aurenes_claw',
+      name: "Gift of Aurene's Claw",
+      materials: [
+        { id: 97138, name: "Gift of Aurene's Claw", quantity: 1, rarity: 'Exotic' },
+      ],
+    },
+    {
+      id: 'precursor_aurene_claw',
+      name: "Aurene's Talon (Precursor)",
+      materials: [
+        { id: 97137, name: "Aurene's Talon", quantity: 1, rarity: 'Ascended' },
+      ],
+    },
+  ],
+};
+
+export const AURENES_FLIGHT_MATERIALS: LegendaryMaterialData = {
+  legendaryId: 'aurenes_flight',
+  legendaryName: "Aurene's Flight",
+  generation: 3,
+  weaponType: 'Greatsword',
+  components: [
+    GIFT_OF_AURENE_LEGEND,
+    {
+      id: 'gift_of_aurenes_flight',
+      name: "Gift of Aurene's Flight",
+      materials: [
+        { id: 96937, name: "Gift of Aurene's Flight", quantity: 1, rarity: 'Exotic' },
+      ],
+    },
+    {
+      id: 'precursor_aurene_flight',
+      name: "Aurene's Wing (Precursor)",
+      materials: [
+        { id: 96936, name: "Aurene's Wing", quantity: 1, rarity: 'Ascended' },
+      ],
+    },
+  ],
+};
+
+export const AURENES_GAZE_MATERIALS: LegendaryMaterialData = {
+  legendaryId: 'aurenes_gaze',
+  legendaryName: "Aurene's Gaze",
+  generation: 3,
+  weaponType: 'Staff',
+  components: [
+    GIFT_OF_AURENE_LEGEND,
+    {
+      id: 'gift_of_aurenes_gaze',
+      name: "Gift of Aurene's Gaze",
+      materials: [
+        { id: 97590, name: "Gift of Aurene's Gaze", quantity: 1, rarity: 'Exotic' },
+      ],
+    },
+    {
+      id: 'precursor_aurene_gaze',
+      name: "Aurene's Eye (Precursor)",
+      materials: [
+        { id: 97589, name: "Aurene's Eye", quantity: 1, rarity: 'Ascended' },
+      ],
+    },
+  ],
+};
+
+export const AURENES_PERSUASION_MATERIALS: LegendaryMaterialData = {
+  legendaryId: 'aurenes_persuasion',
+  legendaryName: "Aurene's Persuasion",
+  generation: 3,
+  weaponType: 'Scepter',
+  components: [
+    GIFT_OF_AURENE_LEGEND,
+    {
+      id: 'gift_of_aurenes_persuasion',
+      name: "Gift of Aurene's Persuasion",
+      materials: [
+        { id: 97165, name: "Gift of Aurene's Persuasion", quantity: 1, rarity: 'Exotic' },
+      ],
+    },
+    {
+      id: 'precursor_aurene_persuasion',
+      name: "Aurene's Argument (Precursor)",
+      materials: [
+        { id: 97164, name: "Aurene's Argument", quantity: 1, rarity: 'Ascended' },
+      ],
+    },
+  ],
+};
+
+export const AURENES_PROOF_MATERIALS: LegendaryMaterialData = {
+  legendaryId: 'aurenes_proof',
+  legendaryName: "Aurene's Proof",
+  generation: 3,
+  weaponType: 'Shield',
+  components: [
+    GIFT_OF_AURENE_LEGEND,
+    {
+      id: 'gift_of_aurenes_proof',
+      name: "Gift of Aurene's Proof",
+      materials: [
+        { id: 96827, name: "Gift of Aurene's Proof", quantity: 1, rarity: 'Exotic' },
+      ],
+    },
+    {
+      id: 'precursor_aurene_proof',
+      name: "Aurene's Ward (Precursor)",
+      materials: [
+        { id: 96826, name: "Aurene's Ward", quantity: 1, rarity: 'Ascended' },
+      ],
+    },
+  ],
+};
+
+export const AURENES_SCALE_MATERIALS: LegendaryMaterialData = {
+  legendaryId: 'aurenes_scale',
+  legendaryName: "Aurene's Scale",
+  generation: 3,
+  weaponType: 'Focus',
+  components: [
+    GIFT_OF_AURENE_LEGEND,
+    {
+      id: 'gift_of_aurenes_scale',
+      name: "Gift of Aurene's Scale",
+      materials: [
+        { id: 97099, name: "Gift of Aurene's Scale", quantity: 1, rarity: 'Exotic' },
+      ],
+    },
+    {
+      id: 'precursor_aurene_scale',
+      name: "Aurene's Shard (Precursor)",
+      materials: [
+        { id: 97098, name: "Aurene's Shard", quantity: 1, rarity: 'Ascended' },
+      ],
+    },
+  ],
+};
+
+export const AURENES_TAIL_MATERIALS: LegendaryMaterialData = {
+  legendaryId: 'aurenes_tail',
+  legendaryName: "Aurene's Tail",
+  generation: 3,
+  weaponType: 'Warhorn',
+  components: [
+    GIFT_OF_AURENE_LEGEND,
+    {
+      id: 'gift_of_aurenes_tail',
+      name: "Gift of Aurene's Tail",
+      materials: [
+        { id: 97783, name: "Gift of Aurene's Tail", quantity: 1, rarity: 'Exotic' },
+      ],
+    },
+    {
+      id: 'precursor_aurene_tail',
+      name: "Aurene's Spine (Precursor)",
+      materials: [
+        { id: 97782, name: "Aurene's Spine", quantity: 1, rarity: 'Ascended' },
+      ],
+    },
+  ],
+};
+
+export const AURENES_TALONS_MATERIALS: LegendaryMaterialData = {
+  legendaryId: 'aurenes_talons',
+  legendaryName: "Aurene's Talons",
+  generation: 3,
+  weaponType: 'Sword',
+  components: [
+    GIFT_OF_AURENE_LEGEND,
+    {
+      id: 'gift_of_aurenes_talons',
+      name: "Gift of Aurene's Talons",
+      materials: [
+        { id: 96652, name: "Gift of Aurene's Talons", quantity: 1, rarity: 'Exotic' },
+      ],
+    },
+    {
+      id: 'precursor_aurene_talons',
+      name: "Aurene's Claws (Precursor)",
+      materials: [
+        { id: 96651, name: "Aurene's Claws", quantity: 1, rarity: 'Ascended' },
+      ],
+    },
+  ],
+};
+
+export const AURENES_VOICE_MATERIALS: LegendaryMaterialData = {
+  legendaryId: 'aurenes_voice',
+  legendaryName: "Aurene's Voice",
+  generation: 3,
+  weaponType: 'Torch',
+  components: [
+    GIFT_OF_AURENE_LEGEND,
+    {
+      id: 'gift_of_aurenes_voice',
+      name: "Gift of Aurene's Voice",
+      materials: [
+        { id: 97829, name: "Gift of Aurene's Voice", quantity: 1, rarity: 'Exotic' },
+      ],
+    },
+    {
+      id: 'precursor_aurene_voice',
+      name: "Aurene's Cry (Precursor)",
+      materials: [
+        { id: 97828, name: "Aurene's Cry", quantity: 1, rarity: 'Ascended' },
+      ],
+    },
+  ],
+};
+
+export const AURENES_WEIGHT_MATERIALS: LegendaryMaterialData = {
+  legendaryId: 'aurenes_weight',
+  legendaryName: "Aurene's Weight",
+  generation: 3,
+  weaponType: 'Hammer',
+  components: [
+    GIFT_OF_AURENE_LEGEND,
+    {
+      id: 'gift_of_aurenes_weight',
+      name: "Gift of Aurene's Weight",
+      materials: [
+        { id: 96203, name: "Gift of Aurene's Weight", quantity: 1, rarity: 'Exotic' },
+      ],
+    },
+    {
+      id: 'precursor_aurene_weight',
+      name: "Aurene's Heft (Precursor)",
+      materials: [
+        { id: 96202, name: "Aurene's Heft", quantity: 1, rarity: 'Ascended' },
+      ],
+    },
+  ],
+};
+
+export const AURENES_WING_MATERIALS: LegendaryMaterialData = {
+  legendaryId: 'aurenes_wing',
+  legendaryName: "Aurene's Wing",
+  generation: 3,
+  weaponType: 'Longbow',
+  components: [
+    GIFT_OF_AURENE_LEGEND,
+    {
+      id: 'gift_of_aurenes_wing',
+      name: "Gift of Aurene's Wing",
+      materials: [
+        { id: 97217, name: "Gift of Aurene's Wing", quantity: 1, rarity: 'Exotic' },
+      ],
+    },
+    {
+      id: 'precursor_aurene_wing',
+      name: "Aurene's Pinion (Precursor)",
+      materials: [
+        { id: 97216, name: "Aurene's Pinion", quantity: 1, rarity: 'Ascended' },
+      ],
+    },
+  ],
+};
+
+export const AURENES_WISDOM_MATERIALS: LegendaryMaterialData = {
+  legendaryId: 'aurenes_wisdom',
+  legendaryName: "Aurene's Wisdom",
+  generation: 3,
+  weaponType: 'Shortbow',
+  components: [
+    GIFT_OF_AURENE_LEGEND,
+    {
+      id: 'gift_of_aurenes_wisdom',
+      name: "Gift of Aurene's Wisdom",
+      materials: [
+        { id: 97413, name: "Gift of Aurene's Wisdom", quantity: 1, rarity: 'Exotic' },
+      ],
+    },
+    {
+      id: 'precursor_aurene_wisdom',
+      name: "Aurene's Knowledge (Precursor)",
+      materials: [
+        { id: 97412, name: "Aurene's Knowledge", quantity: 1, rarity: 'Ascended' },
+      ],
+    },
+  ],
+};
+
+export const CELESTIAL_COMPASS_MATERIALS: LegendaryMaterialData = {
+  legendaryId: 'celestial_compass',
+  legendaryName: 'Celestial Compass',
+  generation: 3,
+  weaponType: 'Rifle',
+  components: [
+    GIFT_OF_AURENE_LEGEND,
+    {
+      id: 'gift_of_celestial_compass',
+      name: 'Gift of Celestial Compass',
+      materials: [
+        { id: 96028, name: 'Gift of Celestial Compass', quantity: 1, rarity: 'Exotic' },
+      ],
+    },
+    {
+      id: 'precursor_celestial_compass',
+      name: 'Stellar Compass (Precursor)',
+      materials: [
+        { id: 96027, name: 'Stellar Compass', quantity: 1, rarity: 'Ascended' },
+      ],
+    },
+  ],
+};
+
+export const DRAGONS_BREATH_MATERIALS: LegendaryMaterialData = {
+  legendaryId: 'dragons_breath',
+  legendaryName: "Dragon's Breath",
+  generation: 3,
+  weaponType: 'Mace',
+  components: [
+    GIFT_OF_AURENE_LEGEND,
+    {
+      id: 'gift_of_dragons_breath',
+      name: "Gift of Dragon's Breath",
+      materials: [
+        { id: 96356, name: "Gift of Dragon's Breath", quantity: 1, rarity: 'Exotic' },
+      ],
+    },
+    {
+      id: 'precursor_dragons_breath',
+      name: "Dragon's Fury (Precursor)",
+      materials: [
+        { id: 96355, name: "Dragon's Fury", quantity: 1, rarity: 'Ascended' },
+      ],
+    },
+  ],
+};
+
+export const DRAGONSBLOOD_MATERIALS: LegendaryMaterialData = {
+  legendaryId: 'dragonsblood',
+  legendaryName: 'Dragonsblood',
+  generation: 3,
+  weaponType: 'Axe',
+  components: [
+    GIFT_OF_AURENE_LEGEND,
+    {
+      id: 'gift_of_dragonsblood',
+      name: 'Gift of Dragonsblood',
+      materials: [
+        { id: 96722, name: 'Gift of Dragonsblood', quantity: 1, rarity: 'Exotic' },
+      ],
+    },
+    {
+      id: 'precursor_dragonsblood',
+      name: 'Dragonscale (Precursor)',
+      materials: [
+        { id: 96721, name: 'Dragonscale', quantity: 1, rarity: 'Ascended' },
+      ],
+    },
+  ],
+};
+
 // Export all materials data
 export const ALL_LEGENDARY_MATERIALS: LegendaryMaterialData[] = [
   // Gen 1
@@ -1065,6 +1465,23 @@ export const ALL_LEGENDARY_MATERIALS: LegendaryMaterialData[] = [
   EXORDIUM_MATERIALS,
   PHARUS_MATERIALS,
   CLAW_OF_KHAN_UR_MATERIALS,
+  // Gen 3
+  AURENES_BITE_MATERIALS,
+  AURENES_CLAW_MATERIALS,
+  AURENES_FLIGHT_MATERIALS,
+  AURENES_GAZE_MATERIALS,
+  AURENES_PERSUASION_MATERIALS,
+  AURENES_PROOF_MATERIALS,
+  AURENES_SCALE_MATERIALS,
+  AURENES_TAIL_MATERIALS,
+  AURENES_TALONS_MATERIALS,
+  AURENES_VOICE_MATERIALS,
+  AURENES_WEIGHT_MATERIALS,
+  AURENES_WING_MATERIALS,
+  AURENES_WISDOM_MATERIALS,
+  CELESTIAL_COMPASS_MATERIALS,
+  DRAGONS_BREATH_MATERIALS,
+  DRAGONSBLOOD_MATERIALS,
 ];
 
 // Helper function to get materials by legendary ID
