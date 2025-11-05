@@ -604,10 +604,32 @@ const MYSTIC_TRIBUTE: ComponentRequirement = {
   id: 'mystic_tribute',
   name: 'Mystic Tribute',
   materials: [
-    { id: 19675, name: 'Gift of Condensed Magic', quantity: 1, rarity: 'Exotic' },
-    { id: 19676, name: 'Gift of Condensed Might', quantity: 1, rarity: 'Exotic' },
+    { id: 70867, name: 'Gift of Condensed Might', quantity: 1, rarity: 'Exotic' },
+    { id: 76530, name: 'Gift of Condensed Magic', quantity: 1, rarity: 'Exotic' },
     { id: 19721, name: 'Mystic Clover', quantity: 77, rarity: 'Exotic' },
     { id: 19679, name: 'Obsidian Shard', quantity: 250, rarity: 'Rare' },
+  ],
+  subComponents: [
+    {
+      id: 'gift_of_condensed_might',
+      name: 'Gift of Condensed Might',
+      materials: [
+        { id: 24358, name: 'Gift of Fangs', quantity: 1, rarity: 'Exotic' },
+        { id: 24357, name: 'Gift of Scales', quantity: 1, rarity: 'Exotic' },
+        { id: 24289, name: 'Gift of Claws', quantity: 1, rarity: 'Exotic' },
+        { id: 24288, name: 'Gift of Bones', quantity: 1, rarity: 'Exotic' },
+      ],
+    },
+    {
+      id: 'gift_of_condensed_magic',
+      name: 'Gift of Condensed Magic',
+      materials: [
+        { id: 24277, name: 'Gift of Blood', quantity: 1, rarity: 'Exotic' },
+        { id: 24276, name: 'Gift of Venom', quantity: 1, rarity: 'Exotic' },
+        { id: 24275, name: 'Gift of Totems', quantity: 1, rarity: 'Exotic' },
+        { id: 24274, name: 'Gift of Dust', quantity: 1, rarity: 'Exotic' },
+      ],
+    },
   ],
 };
 
@@ -1030,26 +1052,59 @@ export const CLAW_OF_KHAN_UR_MATERIALS: LegendaryMaterialData = {
 // GENERATION 3 LEGENDARY WEAPONS (End of Dragons - Aurene)
 
 // Common materials for Gen 3
-const GIFT_OF_AURENE_LEGEND: ComponentRequirement = {
-  id: 'gift_of_aurene_legend',
-  name: "Gift of Aurene's Legend",
+const DRACONIC_TRIBUTE: ComponentRequirement = {
+  id: 'draconic_tribute',
+  name: 'Draconic Tribute',
   materials: [
-    { id: 96722, name: "Aurene's Might", quantity: 1, rarity: 'Exotic' },
-    { id: 96827, name: "Aurene's Magic", quantity: 1, rarity: 'Exotic' },
-    { id: 97099, name: 'Mystic Clover', quantity: 77, rarity: 'Exotic' },
-    { id: 96937, name: 'Prismatic Jade', quantity: 250, rarity: 'Rare' },
+    { id: 19721, name: 'Mystic Clover', quantity: 38, rarity: 'Exotic' },
+    { id: 70867, name: 'Gift of Condensed Might', quantity: 1, rarity: 'Exotic' },
+    { id: 76530, name: 'Gift of Condensed Magic', quantity: 1, rarity: 'Exotic' },
+    { id: 97099, name: 'Amalgamated Draconic Lodestone', quantity: 5, rarity: 'Ascended' },
+  ],
+  subComponents: [
+    {
+      id: 'gift_of_condensed_might',
+      name: 'Gift of Condensed Might',
+      materials: [
+        { id: 24358, name: 'Gift of Fangs', quantity: 1, rarity: 'Exotic' },
+        { id: 24357, name: 'Gift of Scales', quantity: 1, rarity: 'Exotic' },
+        { id: 24289, name: 'Gift of Claws', quantity: 1, rarity: 'Exotic' },
+        { id: 24288, name: 'Gift of Bones', quantity: 1, rarity: 'Exotic' },
+      ],
+    },
+    {
+      id: 'gift_of_condensed_magic',
+      name: 'Gift of Condensed Magic',
+      materials: [
+        { id: 24277, name: 'Gift of Blood', quantity: 1, rarity: 'Exotic' },
+        { id: 24276, name: 'Gift of Venom', quantity: 1, rarity: 'Exotic' },
+        { id: 24275, name: 'Gift of Totems', quantity: 1, rarity: 'Exotic' },
+        { id: 24274, name: 'Gift of Dust', quantity: 1, rarity: 'Exotic' },
+      ],
+    },
   ],
 };
 
-// Note: Gen 3 legendaries are simplified - they don't have detailed breakdowns
-// in the game like Gen 1/2. Materials are primarily obtained through EoD content.
+const GIFT_OF_JADE_MASTERY: ComponentRequirement = {
+  id: 'gift_of_jade_mastery',
+  name: 'Gift of Jade Mastery',
+  materials: [
+    { id: 96722, name: 'Gift of the Dragon Empire', quantity: 1, rarity: 'Exotic' },
+    { id: 96052, name: 'Jade Runestone', quantity: 100, rarity: 'Rare' },
+    { id: 97099, name: 'Chunk of Pure Jade', quantity: 200, rarity: 'Rare' },
+    { id: 96937, name: 'Chunk of Ancient Ambergris', quantity: 100, rarity: 'Rare' },
+    { id: 19678, name: 'Bloodstone Shard', quantity: 1, rarity: 'Exotic' },
+    { id: 19676, name: 'Spirit Shard', quantity: 200, rarity: 'Rare', type: 'currency' },
+  ],
+};
 export const AURENES_BITE_MATERIALS: LegendaryMaterialData = {
   legendaryId: 'aurenes_bite',
   legendaryName: "Aurene's Bite",
   generation: 3,
   weaponType: 'Greatsword',
   components: [
-    GIFT_OF_AURENE_LEGEND,
+    GIFT_OF_JADE_MASTERY,
+    DRACONIC_TRIBUTE,
     {
       id: 'gift_of_aurenes_bite',
       name: "Gift of Aurene's Bite",
@@ -1058,10 +1113,10 @@ export const AURENES_BITE_MATERIALS: LegendaryMaterialData = {
       ],
     },
     {
-      id: 'precursor_aurene_bite',
-      name: "Aurene's Fang (Precursor)",
+      id: 'precursor_dragons_bite',
+      name: "Dragon's Bite (Precursor)",
       materials: [
-        { id: 97076, name: "Aurene's Fang", quantity: 1, rarity: 'Ascended' },
+        { id: 97076, name: "Dragon's Bite", quantity: 1, rarity: 'Ascended' },
       ],
     },
   ],
@@ -1073,7 +1128,8 @@ export const AURENES_CLAW_MATERIALS: LegendaryMaterialData = {
   generation: 3,
   weaponType: 'Dagger',
   components: [
-    GIFT_OF_AURENE_LEGEND,
+    GIFT_OF_JADE_MASTERY,
+    DRACONIC_TRIBUTE,
     {
       id: 'gift_of_aurenes_claw',
       name: "Gift of Aurene's Claw",
@@ -1097,7 +1153,8 @@ export const AURENES_FLIGHT_MATERIALS: LegendaryMaterialData = {
   generation: 3,
   weaponType: 'Longbow',
   components: [
-    GIFT_OF_AURENE_LEGEND,
+    GIFT_OF_JADE_MASTERY,
+    DRACONIC_TRIBUTE,
     {
       id: 'gift_of_aurenes_flight',
       name: "Gift of Aurene's Flight",
@@ -1121,7 +1178,8 @@ export const AURENES_GAZE_MATERIALS: LegendaryMaterialData = {
   generation: 3,
   weaponType: 'Focus',
   components: [
-    GIFT_OF_AURENE_LEGEND,
+    GIFT_OF_JADE_MASTERY,
+    DRACONIC_TRIBUTE,
     {
       id: 'gift_of_aurenes_gaze',
       name: "Gift of Aurene's Gaze",
@@ -1145,7 +1203,8 @@ export const AURENES_PERSUASION_MATERIALS: LegendaryMaterialData = {
   generation: 3,
   weaponType: 'Rifle',
   components: [
-    GIFT_OF_AURENE_LEGEND,
+    GIFT_OF_JADE_MASTERY,
+    DRACONIC_TRIBUTE,
     {
       id: 'gift_of_aurenes_persuasion',
       name: "Gift of Aurene's Persuasion",
@@ -1169,7 +1228,8 @@ export const AURENES_INSIGHT_MATERIALS: LegendaryMaterialData = {
   generation: 3,
   weaponType: 'Staff',
   components: [
-    GIFT_OF_AURENE_LEGEND,
+    GIFT_OF_JADE_MASTERY,
+    DRACONIC_TRIBUTE,
     {
       id: 'gift_of_aurenes_insight',
       name: "Gift of Aurene's Insight",
@@ -1193,7 +1253,8 @@ export const AURENES_SCALE_MATERIALS: LegendaryMaterialData = {
   generation: 3,
   weaponType: 'Shield',
   components: [
-    GIFT_OF_AURENE_LEGEND,
+    GIFT_OF_JADE_MASTERY,
+    DRACONIC_TRIBUTE,
     {
       id: 'gift_of_aurenes_scale',
       name: "Gift of Aurene's Scale",
@@ -1217,7 +1278,8 @@ export const AURENES_TAIL_MATERIALS: LegendaryMaterialData = {
   generation: 3,
   weaponType: 'Mace',
   components: [
-    GIFT_OF_AURENE_LEGEND,
+    GIFT_OF_JADE_MASTERY,
+    DRACONIC_TRIBUTE,
     {
       id: 'gift_of_aurenes_tail',
       name: "Gift of Aurene's Tail",
@@ -1241,7 +1303,8 @@ export const AURENES_RENDING_MATERIALS: LegendaryMaterialData = {
   generation: 3,
   weaponType: 'Axe',
   components: [
-    GIFT_OF_AURENE_LEGEND,
+    GIFT_OF_JADE_MASTERY,
+    DRACONIC_TRIBUTE,
     {
       id: 'gift_of_aurenes_rending',
       name: "Gift of Aurene's Rending",
@@ -1265,7 +1328,8 @@ export const AURENES_VOICE_MATERIALS: LegendaryMaterialData = {
   generation: 3,
   weaponType: 'Warhorn',
   components: [
-    GIFT_OF_AURENE_LEGEND,
+    GIFT_OF_JADE_MASTERY,
+    DRACONIC_TRIBUTE,
     {
       id: 'gift_of_aurenes_voice',
       name: "Gift of Aurene's Voice",
@@ -1289,7 +1353,8 @@ export const AURENES_WEIGHT_MATERIALS: LegendaryMaterialData = {
   generation: 3,
   weaponType: 'Hammer',
   components: [
-    GIFT_OF_AURENE_LEGEND,
+    GIFT_OF_JADE_MASTERY,
+    DRACONIC_TRIBUTE,
     {
       id: 'gift_of_aurenes_weight',
       name: "Gift of Aurene's Weight",
@@ -1313,7 +1378,8 @@ export const AURENES_WING_MATERIALS: LegendaryMaterialData = {
   generation: 3,
   weaponType: 'Shortbow',
   components: [
-    GIFT_OF_AURENE_LEGEND,
+    GIFT_OF_JADE_MASTERY,
+    DRACONIC_TRIBUTE,
     {
       id: 'gift_of_aurenes_wing',
       name: "Gift of Aurene's Wing",
@@ -1337,7 +1403,8 @@ export const AURENES_WISDOM_MATERIALS: LegendaryMaterialData = {
   generation: 3,
   weaponType: 'Scepter',
   components: [
-    GIFT_OF_AURENE_LEGEND,
+    GIFT_OF_JADE_MASTERY,
+    DRACONIC_TRIBUTE,
     {
       id: 'gift_of_aurenes_wisdom',
       name: "Gift of Aurene's Wisdom",
@@ -1362,7 +1429,8 @@ export const AURENES_FANG_MATERIALS: LegendaryMaterialData = {
   generation: 3,
   weaponType: 'Sword',
   components: [
-    GIFT_OF_AURENE_LEGEND,
+    GIFT_OF_JADE_MASTERY,
+    DRACONIC_TRIBUTE,
     {
       id: 'gift_of_aurenes_fang',
       name: "Gift of Aurene's Fang",
@@ -1386,7 +1454,8 @@ export const AURENES_ARGUMENT_MATERIALS: LegendaryMaterialData = {
   generation: 3,
   weaponType: 'Pistol',
   components: [
-    GIFT_OF_AURENE_LEGEND,
+    GIFT_OF_JADE_MASTERY,
+    DRACONIC_TRIBUTE,
     {
       id: 'gift_of_aurenes_argument',
       name: "Gift of Aurene's Argument",
@@ -1410,7 +1479,8 @@ export const AURENES_BREATH_MATERIALS: LegendaryMaterialData = {
   generation: 3,
   weaponType: 'Torch',
   components: [
-    GIFT_OF_AURENE_LEGEND,
+    GIFT_OF_JADE_MASTERY,
+    DRACONIC_TRIBUTE,
     {
       id: 'gift_of_aurenes_breath',
       name: "Gift of Aurene's Breath",
